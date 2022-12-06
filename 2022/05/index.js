@@ -23,19 +23,15 @@ inputStacks
 
 stacks = stacks.map((col) => col.filter(Boolean));
 
-inputCmd.split('\n').map((cmdRaw) => {
-    const cmd = cmdRaw.match(/move (\d+) from (\d+) to (\d+)/);
-    const num = parseInt(cmd[1]);
-    const from = parseInt(cmd[2]) - 1;
-    const to = parseInt(cmd[3]) - 1;
+inputCmd.split('\n').forEach((cmdRaw) => {
+    const cmd = cmdRaw.match(
+        /move (?<num>\d+) from (?<from>\d+) to (?<to>\d+)/
+    );
+    const num = parseInt(cmd.groups.num);
+    const from = parseInt(cmd.groups.from) - 1;
+    const to = parseInt(cmd.groups.to) - 1;
 
-    const values = [];
-
-    for (let i = 0; i < num; i++) {
-        const val = stacks[from].shift();
-
-        values.push(val);
-    }
+    const values = new Array(num).fill(null).map(() => stacks[from].shift());
 
     stacks[to].unshift(...values);
 });
