@@ -15,8 +15,6 @@ inputStacks
     .map((col, i) =>
         col.map((char, j) => {
             stacks[j] = stacks[j] || [];
-            stacks[j][i] = stacks[j][i] || [];
-
             stacks[j][i] = char;
         })
     );
