@@ -69,8 +69,8 @@ function buildFilesystem(rawInput) {
     console.log('part 1:', sum);
 
     // part 2
-    const diskSpace = 70000000;
-    const neededUnusedspace = 30000000;
+    const diskSpace = 70_000_000;
+    const neededUnusedspace = 30_000_000;
     const currentSpace = dirSizes['/'];
     const unusedSpace = diskSpace - currentSpace;
     const reqSpace = neededUnusedspace - unusedSpace;
