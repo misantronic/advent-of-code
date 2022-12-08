@@ -14,12 +14,8 @@ const visibilityMap = grid.map((row, y) => {
             x === 0 || y === 0 || x === row.length - 1 || y === grid.length - 1;
 
         const value = tree;
-        const top = grid[y - 1]?.[x];
-        const right = grid[y]?.[x + 1];
-        const bottom = grid[y + 1]?.[x];
-        const left = grid[y]?.[x - 1];
 
-        return { edge, value, top, right, bottom, left };
+        return { edge, value };
     });
 });
 
@@ -94,18 +90,14 @@ function calculateScenicView() {
             for (direction of ['top', 'right', 'bottom', 'left']) {
                 const edgeTrees = (() => {
                     let cnt = 0;
+
                     for (const edgeTree of edges[direction]) {
                         if (edgeTree < tree.value) {
                             cnt++;
                             continue;
                         }
 
-                        if (edgeTree <= tree.value) {
-                            cnt++;
-                            break;
-                        }
-
-                        if (edgeTree > tree.value) {
+                        if (edgeTree >= tree.value) {
                             cnt++;
                             break;
                         }
