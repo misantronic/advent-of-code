@@ -1,7 +1,6 @@
 import { readFileSync } from 'fs';
 
 const pwd = process.argv[1];
-const inputExample = readFileSync(`${pwd}/input-example.txt`, 'utf-8');
 const input = readFileSync(`${pwd}/input.txt`, 'utf-8');
 
 const grid = input
@@ -118,5 +117,12 @@ function calculateScenicView() {
     }, 0);
 }
 
+console.time('part 1');
 console.log('part 1:', countVisibleTrees());
+console.timeEnd('part 1');
+
+console.log('');
+
+console.time('part 2');
 console.log('part 2:', calculateScenicView());
+console.timeEnd('part 2');
