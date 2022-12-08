@@ -6,18 +6,20 @@ const input = readFileSync(`${pwd}/input.txt`, 'utf-8');
 
 const grid = input
     .split('\n')
-    .map((line) => line.split('').map((tree) => parseInt(tree)));
+    .map((line) => line.split('').map((tree) => parseInt(tree)))
+    .map((row, y, grid) =>
+        row.map((tree, x) => {
+            const edge =
+                x === 0 ||
+                y === 0 ||
+                x === row.length - 1 ||
+                y === grid.length - 1;
 
-const visibilityMap = grid.map((row, y) => {
-    return row.map((tree, x) => {
-        const edge =
-            x === 0 || y === 0 || x === row.length - 1 || y === grid.length - 1;
+            const value = tree;
 
-        const value = tree;
-
-        return { edge, value };
-    });
-});
+            return { edge, value };
+        })
+    );
 
 function getEdges(x, y) {
     const top = [];
@@ -26,16 +28,16 @@ function getEdges(x, y) {
     const left = [];
 
     for (let i = y - 1; i >= 0; i--) {
-        top.push(visibilityMap[i][x].value);
+        top.push(grid[i][x].value);
     }
-    for (let i = x + 1; i < visibilityMap[y].length; i++) {
-        right.push(visibilityMap[y][i].value);
+    for (let i = x + 1; i < grid[y].length; i++) {
+        right.push(grid[y][i].value);
     }
-    for (let i = y + 1; i < visibilityMap[y].length; i++) {
-        bottom.push(visibilityMap[i][x].value);
+    for (let i = y + 1; i < grid[y].length; i++) {
+        bottom.push(grid[i][x].value);
     }
     for (let i = x - 1; i >= 0; i--) {
-        left.push(visibilityMap[y][i].value);
+        left.push(grid[y][i].value);
     }
 
     return {
@@ -47,7 +49,7 @@ function getEdges(x, y) {
 }
 
 function countVisibleTrees() {
-    return visibilityMap.reduce((memo, row, y) => {
+    return grid.reduce((memo, row, y) => {
         row.forEach((tree, x) => {
             if (tree.edge) {
                 memo += 1;
@@ -74,7 +76,7 @@ function countVisibleTrees() {
 }
 
 function calculateScenicView() {
-    return visibilityMap.reduce((memo, row, y) => {
+    return grid.reduce((memo, row, y) => {
         const scores = row.map((tree, x) => {
             if (tree.edge) {
                 return 0;
