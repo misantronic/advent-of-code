@@ -18,7 +18,8 @@
     },
     "prettier": {
         "tabWidth": 4,
-        "singleQuote": true
+        "singleQuote": true,
+        "trailingComma": "none"
     },
     "homepage": "https://github.com/misantronic/advent-of-code#readme",
     "devDependencies": {
