@@ -6,7 +6,7 @@ const input = readFileSync(`${pwd}/input.txt`, 'utf-8');
 
 const grid = input
     .split('\n')
-    .map((line) => line.split('').map((tree) => parseInt(tree)))
+    .map((line) => line.split('').map(Number))
     .map((row, y, grid) =>
         row.map((tree, x) => {
             const edge =
