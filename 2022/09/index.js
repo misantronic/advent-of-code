@@ -52,7 +52,7 @@ function moveBy([dx, dy]) {
         const b = xOrY === 1 ? 0 : 1;
 
         for (let i = 1; i <= maxI; i++) {
-            const add = dir < 0 ? -1 : 1;
+            const add = Math.sign(dir);
 
             p.H[a] += add;
 
