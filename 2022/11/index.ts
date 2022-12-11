@@ -1,10 +1,10 @@
 import { lines, readFile } from '../utils';
 
-const input = readFile('input-example.txt');
+const input = readFile('input.txt');
 
 class Monkey {
     name: string;
-    items: bigint[] = [];
+    items: number[] = [];
     inspections = 0;
 
     private operationRaw: string;
@@ -12,12 +12,12 @@ class Monkey {
     private testTrueRaw: string;
     private testFalseRaw: string;
 
-    operation(item: bigint) {
+    operation(item: number) {
         this.inspections++;
 
         const [_, operator, rawNum] =
             this.operationRaw.match(/(\*|\+) (\d+|old)$/)!;
-        const num = BigInt(rawNum === 'old' ? item : Number(rawNum));
+        const num = rawNum === 'old' ? item : Number(rawNum);
 
         switch (operator as '*' | '+') {
             case '*':
@@ -27,32 +27,34 @@ class Monkey {
         }
     }
 
-    test(item: bigint) {
-        const divisor = BigInt(this.testRaw.split('divisible by ').pop()!);
+    public get testDivisor() {
+        return Number(this.testRaw.split('divisible by ').pop()!);
+    }
+
+    test(item: number) {
         const trueTarget = this.testTrueRaw.split('If true: throw to ').pop()!;
         const falseTarget = this.testFalseRaw
             .split('If false: throw to ')
             .pop()!;
 
-        const level = item / divisor;
-        const success = item % divisor === 0n;
+        const success = item % this.testDivisor === 0;
 
         return {
-            level,
-            success,
             monkey: success ? trueTarget : falseTarget
         };
     }
 
-    bore(item: bigint, divisor: bigint): bigint {
-        return divisor === 1n ? item : item / divisor;
+    bore(item: number, divisor: number | null): number {
+        return divisor === null
+            ? item % this.testDivisor
+            : Math.floor(item / divisor);
     }
 
-    addItem(item: bigint) {
+    addItem(item: number) {
         this.items.push(item);
     }
 
-    removeItem(item: bigint) {
+    removeItem(item: number) {
         this.items = this.items.filter((x) => x !== item);
     }
 
@@ -69,7 +71,7 @@ class Monkey {
         this.name = name.replace(/:$/, '').toLowerCase();
         this.items = (itemsRaw.split('Starting items: ').pop() ?? '')
             .split(', ')
-            .map(BigInt);
+            .map(Number);
 
         this.operationRaw = operationRaw;
         this.testRaw = testRaw;
@@ -78,16 +80,20 @@ class Monkey {
     }
 }
 
-function iterateMonkeys(rounds: number, worryDivisor: bigint) {
+function iterateMonkeys(rounds: number, worryDivisor?: number) {
     const monkeys = input.split('\n\n').map((raw) => new Monkey(raw));
 
-    for (let round = 1; round <= rounds; round++) {
-        console.log('round', round);
+    const divider = monkeys
+        .map((m) => m.testDivisor)
+        .reduce((a, b) => a * b, 1);
 
+    for (let round = 1; round <= rounds; round++) {
         monkeys.forEach((monkey) => {
             monkey.items.forEach((item) => {
                 const opRes = monkey.operation(item);
-                const boreRes = monkey.bore(opRes, worryDivisor);
+                const boreRes = worryDivisor
+                    ? Math.floor(item / worryDivisor)
+                    : opRes % divider;
                 const testRes = monkey.test(boreRes);
 
                 const target = monkeys.find((m) => m.name === testRes.monkey);
@@ -102,7 +108,7 @@ function iterateMonkeys(rounds: number, worryDivisor: bigint) {
 }
 
 function part1() {
-    const [top1, top2] = iterateMonkeys(20, 3n).sort(
+    const [top1, top2] = iterateMonkeys(20, 3).sort(
         (a, b) => b.inspections - a.inspections
     );
 
@@ -110,9 +116,11 @@ function part1() {
 }
 
 function part2() {
-    const monkeys = iterateMonkeys(20, 1n);
+    const [top1, top2] = iterateMonkeys(10000).sort(
+        (a, b) => b.inspections - a.inspections
+    );
 
-    console.log(monkeys);
+    console.log('part 2:', top1.inspections * top2.inspections);
 }
 
 part1();
