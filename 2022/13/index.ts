@@ -3,17 +3,12 @@ import { lines, readFile } from '../utils';
 const input = readFile('input.txt');
 
 function compareNumbers(left: number, right: number) {
-    const msg = `--> ${left} vs ${right}`;
-
     if (left === right) {
-        // console.log(msg, 'equal');
         return undefined;
     }
     if (left < right) {
-        // console.log(msg, 'smaller');
         return true;
     }
-    // console.log(msg, 'bigger');
     return false;
 }
 
@@ -73,18 +68,9 @@ function part1() {
     return getInput().reduce((sum, [left, right], i) => {
         const index = i + 1;
 
-        // console.log(index);
-        // console.log('compare', {
-        //     a: JSON.stringify(left),
-        //     b: JSON.stringify(right)
-        // });
-
         if (compare(left, right)) {
-            // console.log('-> true\n');
             return sum + index;
         }
-
-        // console.log('');
 
         return sum;
     }, 0);
