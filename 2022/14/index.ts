@@ -7,7 +7,7 @@ interface Point {
     sand?: boolean;
 }
 
-const input = lines(readFile('input-example.txt'));
+const input = lines(readFile('input.txt'));
 
 function equal(a?: Point, b?: Point) {
     return a?.x === b?.x && a?.y === b?.y;
@@ -21,6 +21,16 @@ function findPoint(flatGrid: Point[], point: Point) {
     }
 
     return undefined;
+}
+
+function getMinMax(rocks: Point[]) {
+    const { min, max } = Math;
+
+    const maxX = rocks.reduce((x, rock) => max(x, rock.x), 0);
+    const minX = rocks.reduce((x, rock) => min(x, rock.x), maxX);
+    const maxY = rocks.reduce((y, rock) => max(y, rock.y), 0);
+
+    return { minX, maxX, minY: 0, maxY };
 }
 
 const rockLines = input.map((line) => {
@@ -120,13 +130,9 @@ function applySandGravity(grid: Point[], sandPoint: Point): Point | undefined {
     return sandPoint;
 }
 
-function part1() {
-    const { min, max } = Math;
+function createGrid(rockLines: Point[][]) {
     const rocks = rockLines.flat();
-
-    const maxX = rocks.reduce((x, rock) => max(x, rock.x), 0);
-    const minX = rocks.reduce((x, rock) => min(x, rock.x), maxX);
-    const maxY = rocks.reduce((y, rock) => max(y, rock.y), 0);
+    const { minX, maxX, maxY } = getMinMax(rocks);
 
     const grid: Point[][] = [];
 
@@ -164,12 +170,21 @@ function part1() {
         }
     }
 
+    return grid;
+}
+
+function fallSand(grid: Point[][], rockLines: Point[][]) {
+    const { maxY } = getMinMax(rockLines.flat());
     const flatGrid: Point[] = grid.reduce((memo, arr) => [...memo, ...arr], []);
 
     let sandY = 0;
 
     while (true) {
-        const sandPoint = findPoint(flatGrid, { x: sandStart.x, y: sandY })!;
+        const sandPoint = findPoint(flatGrid, { x: sandStart.x, y: sandY });
+
+        if (!sandPoint) {
+            break;
+        }
 
         if (!sandPoint.rock && !sandPoint.sand) {
             sandY++;
@@ -179,9 +194,9 @@ function part1() {
         const sandTarget = { ...sandStart, y: sandY - 1 };
 
         const point = findPoint(flatGrid, sandTarget)!;
-        const newPoint = applySandGravity(flatGrid, point);
+        const result = applySandGravity(flatGrid, point);
 
-        if (newPoint === undefined) {
+        if (result === undefined) {
             break;
         }
 
@@ -197,4 +212,31 @@ function part1() {
     return flatGrid.filter((p) => p.sand).length;
 }
 
+function part1() {
+    const grid = createGrid(rockLines);
+
+    return fallSand(grid, rockLines);
+}
+
+function part2() {
+    const rocks = rockLines.flat();
+    const { minX, maxX, maxY } = getMinMax(rocks);
+    // runs for like 10 mins
+    const numRocks = (maxX - minX) * 8;
+
+    const floorLeft = Array(numRocks / 2)
+        .fill(0)
+        .map<Point>((_, x) => ({ x: minX - x, y: maxY + 2 }));
+    const floorRight = Array(numRocks / 2)
+        .fill(0)
+        .map<Point>((_, x) => ({ x: minX + x, y: maxY + 2 }));
+
+    const newRocklines = [...rockLines, floorLeft, floorRight];
+
+    const grid = createGrid(newRocklines);
+
+    return fallSand(grid, newRocklines);
+}
+
 console.log('part 1:', part1());
+console.log('part 2:', part2());
