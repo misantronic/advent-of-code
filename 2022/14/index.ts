@@ -206,7 +206,7 @@ function fallSand(grid: Point[][], rockLines: Point[][]) {
                 maxY
             ) - 1;
 
-        draw(grid);
+        // draw(grid);
     }
 
     return flatGrid.filter((p) => p.sand).length;
@@ -238,5 +238,10 @@ function part2() {
     return fallSand(grid, newRocklines);
 }
 
+console.time('part 1');
 console.log('part 1:', part1());
+console.timeEnd('part 1');
+
+console.time('part 2');
 console.log('part 2:', part2());
+console.timeEnd('part 2');
