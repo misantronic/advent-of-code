@@ -87,9 +87,7 @@ function hitRock(rock: Rock, point: Point) {
         y: newY + p.y
     }));
 
-    for (const staleRock of staleRocks.slice(
-        Math.max(0, staleRocks.length - 100)
-    )) {
+    for (const staleRock of staleRocks) {
         for (const shape of staleRock.shape) {
             const x = staleRock.pos.x + shape.x;
             const y = staleRock.pos.y + shape.y;
@@ -158,9 +156,12 @@ function draw(minY = 0) {
     const maxY =
         allRocks.reduce((y, rock) => Math.max(y, rock.pos.y), 4) + rock.height;
     const output: string[] = [];
+    const binary: string[] = [];
 
     for (let y = minY; y <= maxY; y++) {
         const line: string[] = [`${y.toString().padStart(4, '0')} `];
+
+        let bin = '0b';
 
         for (let x = minX; x <= maxX; x++) {
             const char = (() => {
@@ -195,13 +196,21 @@ function draw(minY = 0) {
                 return '.';
             })();
 
+            if (x >= 0) {
+                bin = `${bin}${char === '#' ? '1' : '0'}`;
+            }
+
             line.push(char);
         }
+
+        binary.push(eval(bin));
 
         output.push(line.join(''));
     }
 
     console.log(output.reverse().join('\n'));
+
+    console.log(binary.filter(Boolean).length);
     console.log('');
 }
 
@@ -239,13 +248,6 @@ const last = staleRocks.at(-1)!;
 const height = last.pos.y + last.height - 1;
 
 console.log('part 1:', height);
-
-const maxRocks = 1_000_000_000_000;
-const numRocks = staleRocks.length;
-
-const stacks = Math.floor(maxRocks / numRocks) + (maxRocks % numRocks);
-
-console.log('part 2', stacks * height);
 
 console.timeEnd('done');
 
