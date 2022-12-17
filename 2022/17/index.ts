@@ -155,11 +155,11 @@ function draw(minY = 0) {
     const maxX = chamberWidth;
     const maxY =
         allRocks.reduce((y, rock) => Math.max(y, rock.pos.y), 4) + rock.height;
-    const output: string[] = [];
-    const binary: string[] = [];
+    // const output: string[] = [];
+    const binary: number[] = [];
 
     for (let y = minY; y <= maxY; y++) {
-        const line: string[] = [`${y.toString().padStart(4, '0')} `];
+        // const line: string[] = [`${y.toString().padStart(4, '0')} `];
 
         let bin = '0b';
 
@@ -196,22 +196,22 @@ function draw(minY = 0) {
                 return '.';
             })();
 
-            if (x >= 0) {
+            if (x >= 0 && x < maxX) {
                 bin = `${bin}${char === '#' ? '1' : '0'}`;
             }
 
-            line.push(char);
+            // line.push(char);
         }
 
         binary.push(eval(bin));
 
-        output.push(line.join(''));
+        // output.push(line.join(''));
     }
 
-    console.log(output.reverse().join('\n'));
+    // console.log(output.reverse().join('\n'));
+    // console.log('');
 
-    console.log(binary.filter(Boolean).length);
-    console.log('');
+    return binary.filter(Boolean);
 }
 
 const chamberWidth = 7;
@@ -222,7 +222,11 @@ const allRocks: Rock[] = [];
 const staleRocks: Rock[] = [];
 let rock = newRock(shapeIndex);
 
-console.time('done');
+console.time('part 1');
+console.time('part 2');
+
+let binaryPart1: number[] = [];
+let binaryPart2: number[] = [];
 
 while (true) {
     const x = jetList[jetIndex];
@@ -239,17 +243,20 @@ while (true) {
     nextJet();
 
     if (staleRocks.length === 2022) {
-        draw();
+        binaryPart1 = draw();
+    }
+
+    if (staleRocks.length === 3000) {
+        binaryPart2 = draw();
         break;
     }
 }
 
-const last = staleRocks.at(-1)!;
-const height = last.pos.y + last.height - 1;
+console.log('part 1:', binaryPart1.length);
+console.timeEnd('part 1');
 
-console.log('part 1:', height);
-
-console.timeEnd('done');
+console.log('part 2', binaryPart2.length);
+console.timeEnd('part 2');
 
 //     7_352_941_240    too low
 // 1_571_730_910_400    too high
