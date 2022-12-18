@@ -61,10 +61,12 @@ function newRock(shapeIndex: number): Rock {
     const height = Math.max(...shape.map(({ y }) => y)) + 1;
     const x = 2;
     const y =
-        staleRocks.reduce(
-            (y, rock) => Math.max(y, rock.pos.y + rock.height - 1),
-            floorY
-        ) + 4;
+        staleRocks
+            .slice(staleRocks.length - 50)
+            .reduce(
+                (y, rock) => Math.max(y, rock.pos.y + rock.height - 1),
+                floorY
+            ) + 4;
 
     const rock = {
         width,
@@ -72,8 +74,6 @@ function newRock(shapeIndex: number): Rock {
         pos: { x, y },
         shape
     };
-
-    allRocks.push(rock);
 
     return rock;
 }
@@ -87,7 +87,7 @@ function hitRock(rock: Rock, point: Point) {
         y: newY + p.y
     }));
 
-    for (const staleRock of staleRocks) {
+    for (const staleRock of staleRocks.slice(staleRocks.length - 25)) {
         for (const shape of staleRock.shape) {
             const x = staleRock.pos.x + shape.x;
             const y = staleRock.pos.y + shape.y;
@@ -154,7 +154,9 @@ function draw(minY = 0) {
     const minX = -1;
     const maxX = chamberWidth;
     const maxY =
-        allRocks.reduce((y, rock) => Math.max(y, rock.pos.y), 4) + rock.height;
+        staleRocks
+            .slice(staleRocks.length - 25)
+            .reduce((y, rock) => Math.max(y, rock.pos.y), 4) + rock.height;
     // const output: string[] = [];
     const binary: number[] = [];
 
@@ -218,7 +220,6 @@ const chamberWidth = 7;
 let jetIndex = 0;
 let shapeIndex = 0;
 const floorY = 0;
-const allRocks: Rock[] = [];
 const staleRocks: Rock[] = [];
 let rock = newRock(shapeIndex);
 
@@ -242,22 +243,24 @@ while (true) {
 
     nextJet();
 
-    if (staleRocks.length === 2022) {
+    if (staleRocks.length === 2454) {
         binaryPart1 = draw();
+
+        console.log('part 1:', binaryPart1.length);
+        console.timeEnd('part 1');
     }
 
-    if (staleRocks.length === 3000) {
+    if (staleRocks.length === 5000) {
         binaryPart2 = draw();
         break;
     }
 }
 
-console.log('part 1:', binaryPart1.length);
-console.timeEnd('part 1');
-
 console.log('part 2', binaryPart2.length);
+console.log(binaryPart2.join(','));
 console.timeEnd('part 2');
 
 //     7_352_941_240    too low
 // 1_571_730_910_400    too high
 // 1_549_460_675_087
+//  427_6252_560_418
