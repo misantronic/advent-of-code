@@ -1,6 +1,6 @@
 import { lines, readFile } from '../utils';
 
-const input = lines(readFile('input-example.txt'));
+const input = lines(readFile('input.txt'));
 
 interface MonkeyOp {
     name: string;
@@ -20,6 +20,7 @@ function parseInput() {
 
 let monkeys: { [key: string]: number } = {};
 let list = parseInput();
+let formular: (string | number)[][] = [];
 
 function processValue(name: string, value: string | number) {
     if (isNumber(value)) {
@@ -32,12 +33,13 @@ function processValue(name: string, value: string | number) {
         const valLeft = processMonkey(left);
         const valRight = processMonkey(right);
 
-        if (op === '=') {
-            console.log(`${name}:`, left, op, right, valLeft, valRight);
-            // monkeys[name] = monkeys[valLeft] ?? monkeys[valRight];
-        } else {
-            monkeys[name] = eval(`${valLeft} ${op} ${valRight}`);
-        }
+        formular.push([
+            left === 'humn' ? left : valLeft,
+            op,
+            right === 'humn' ? right : valRight
+        ]);
+
+        monkeys[name] = eval(`${valLeft} ${op} ${valRight}`);
     }
 
     return monkeys[name];
@@ -47,6 +49,33 @@ function processMonkey(name: string) {
     const entry = list.find((entry) => entry.name === name)!;
 
     return processValue(entry.name, entry.op);
+}
+
+function printFormular(formular: (string | number)[][]) {
+    return formular
+        .reduce((memo, val, i) => {
+            if (val.includes('humn')) {
+                return [['(', ...val, ')'].join(' ')];
+            }
+
+            if (i === 0) {
+                return [...memo, ['(', ...val, ')'].join(' ')];
+            }
+
+            return [...memo, val.slice(1).join(' ')];
+        }, [])
+        .map((val, i, arr) => {
+            if (i === 0) {
+                const brackets = Array(arr.length - 1)
+                    .fill('(')
+                    .join('');
+
+                return `${brackets}${val}`;
+            }
+
+            return `${val})`;
+        })
+        .join(' ');
 }
 
 function part1() {
@@ -62,14 +91,25 @@ function part2() {
 
     const rootEntry = list.find((entry) => entry.name === 'root')!;
 
-    if (!isNumber(rootEntry.op)) {
-        const [left, right] = rootEntry.op.split(' + ');
-
-        const leftVal = processMonkey(left);
-        const rightVal = processMonkey(right);
-
-        console.log({ leftVal, rightVal });
+    if (isNumber(rootEntry.op)) {
+        return;
     }
+
+    const [left, right] = rootEntry.op.split(' + ');
+
+    formular = [];
+
+    processMonkey(left);
+
+    const formA = printFormular(formular);
+
+    formular = [];
+
+    processMonkey(right);
+
+    const formB = printFormular(formular);
+
+    return `${formA} = ${formB}`;
 }
 
 console.time('part 1');
