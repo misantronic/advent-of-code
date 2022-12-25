@@ -7,5 +7,5 @@ export function readFile(file: string) {
 }
 
 export function lines(input: string) {
-    return input.split('\n');
+    return input.trim().split('\n');
 }
