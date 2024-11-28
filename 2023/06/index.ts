@@ -28,31 +28,16 @@ console.log(
 
 // part 2
 
-const newTime = parseInt(time.reduce((acc, t) => `${acc}${t}`, ''));
-const newDistance = parseInt(distance.reduce((acc, d) => `${acc}${d}`, ''));
+const t = parseInt(time.join(''));
+const d = parseInt(distance.join(''));
 
 console.log(
     'part 2:',
     (() => {
-        const t = newTime;
-        const d = newDistance;
         let wins = 0;
 
-        for (let i = 1; i <= t; i++) {
-            const timeLeft = t - i;
-            const travel = timeLeft * i;
-
-            // console.log(
-            //     'charge:',
-            //     i,
-            //     'ms,',
-            //     'time left:',
-            //     timeLeft,
-            //     'ms,',
-            //     'travel:',
-            //     travel,
-            //     'mm/ms'
-            // );
+        for (let x = 1; x <= t; x++) {
+            const travel = (t - x) * x;
 
             if (travel > d) {
                 wins++;
