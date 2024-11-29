@@ -13,9 +13,8 @@ console.log(
         const d = distance?.[i] ?? 0;
         let wins = 0;
 
-        for (let i = 1; i <= t; i++) {
-            const timeLeft = t - i;
-            const travel = timeLeft * i;
+        for (let x = 1; x <= t; x++) {
+            const travel = (t - x) * x;
 
             if (travel > d) {
                 wins++;
@@ -34,16 +33,8 @@ const d = parseInt(distance.join(''));
 console.log(
     'part 2:',
     (() => {
-        let wins = 0;
+        const x = Math.ceil((t - Math.sqrt(t * t - 4 * d)) / 2);
 
-        for (let x = 1; x <= t; x++) {
-            const travel = (t - x) * x;
-
-            if (travel > d) {
-                wins++;
-            }
-        }
-
-        return wins;
+        return t + 1 - 2 * x;
     })()
 );
