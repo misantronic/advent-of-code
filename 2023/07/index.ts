@@ -120,20 +120,7 @@ const createNewHand = (hand: string, index: number, newCard: Card) => {
     return hand.substring(0, index) + newCard + hand.substring(index + 1);
 };
 
-const exchangeCards: Card[] = [
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    'T',
-    'Q',
-    'K',
-    'A'
-];
+const exchangeCards = '23456789TQKA'.split('') as Card[];
 
 const hands2 = input1.map((line) => {
     const [hand, bid] = line.split(' ');
