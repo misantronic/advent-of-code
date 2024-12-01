@@ -1,12 +1,10 @@
 import re
 import time
+import sys
 
-def read_file(file_path):
-    with open(file_path, 'r') as file:
-        return file.readlines()
+sys.path.insert(0, '../')
 
-def lines(file_content):
-    return [line.strip() for line in file_content]
+from utils import read_file, lines
 
 input1 = lines(read_file('input-example.txt'))
 
@@ -16,8 +14,6 @@ lists = [
 
 # also works
 # lists = [list(map(int, re.findall(r'\d+', line))) for line in input1]
-
-print(lists)
 
 left = sorted([lst[0] for lst in lists])
 right = sorted([lst[1] for lst in lists])
