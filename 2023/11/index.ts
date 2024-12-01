@@ -38,6 +38,9 @@ interface P {
 
 let expandFactor = 1_000_000;
 
+// IMPORTANT NOTE
+// It is not important to draw the whole grid, just the galaxies
+// using the expand factor we can calculate the empty space BEFORE the galaxies
 const galaxies: P[] = [];
 for (let y = 0; y < grid.length; y++) {
     for (let x = 0; x < grid[y].length; x++) {
@@ -45,10 +48,12 @@ for (let y = 0; y < grid.length; y++) {
             galaxies.push({
                 x:
                     x +
+                    // THIS IS THE IMPORTANT PART HERE
                     emptyColumns.filter((col) => col < x).length *
                         (expandFactor - 1),
                 y:
                     y +
+                    // THIS IS THE IMPORTANT PART HERE
                     emptyRows.filter((row) => row < y).length *
                         (expandFactor - 1)
             });
