@@ -1,9 +1,9 @@
 import { lines, readFile } from '../utils';
 
-const input1 = lines(readFile('./input-example.txt'));
+const input1 = lines(readFile('./input.txt'));
 const grid = input1.map((line) => line.split(''));
 
-console.time('part 1');
+console.time('part 2');
 
 const columns: string[][] = [];
 const emptyRows: number[] = [];
@@ -36,38 +36,25 @@ interface P {
     y: number;
 }
 
-const expandedGrid: string[][] = grid
-    .reduce((acc, row, y) => {
-        if (emptyRows.includes(y)) {
-            const fill = Array(row.length).fill('.') as string[];
+let expandFactor = 1_000_000;
 
-            return [...acc, row, Array(1).fill(fill)];
+const galaxies: P[] = [];
+for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y].length; x++) {
+        if (grid[y][x] === '#') {
+            galaxies.push({
+                x:
+                    x +
+                    emptyColumns.filter((col) => col < x).length *
+                        (expandFactor - 1),
+                y:
+                    y +
+                    emptyRows.filter((row) => row < y).length *
+                        (expandFactor - 1)
+            });
         }
-
-        return [...acc, row];
-    }, [] as string[][])
-    .reduce((acc: string[][], row: string[]) => {
-        return [
-            ...acc,
-            row.reduce((acc2, column, x) => {
-                if (emptyColumns.includes(x)) {
-                    return [...acc2, column, ...Array(1).fill('.')];
-                }
-
-                return [...acc2, column];
-            }, [] as string[])
-        ];
-    }, [] as string[][]);
-
-const galaxies = expandedGrid.reduce((acc, row, y) => {
-    return row.reduce((acc2, cell, x) => {
-        if (cell === '#') {
-            return [...acc2, { x, y }];
-        }
-
-        return acc2;
-    }, acc);
-}, [] as P[]);
+    }
+}
 
 function manhattanDistance(p1: P, p2: P): number {
     return Math.abs(p1.x - p2.x) + Math.abs(p2.y - p1.y);
@@ -94,7 +81,7 @@ const allPaths = calculateShortestPaths(galaxies);
 
 console.log('');
 console.log(
-    'part 1:',
+    'part 2:',
     allPaths.reduce((acc, paths, i) => {
         // console.log('galaxy', i + 1, paths);
 
@@ -103,4 +90,4 @@ console.log(
         }, acc);
     }, 0) / 2
 );
-console.timeEnd('part 1');
+console.timeEnd('part 2');
