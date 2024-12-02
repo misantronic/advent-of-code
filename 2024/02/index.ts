@@ -4,6 +4,10 @@ const input = lines(readFile('./input.txt')).map((line) =>
     line.split(' ').map(Number)
 );
 
+const splice = (array: number[], index: number) => {
+    return array.filter((_, i) => index !== i);
+};
+
 const test = (numbers: number[]) => {
     let decTest = true;
     let incTest = true;
@@ -48,7 +52,7 @@ console.log(
         }
 
         for (let i = 0; i < numbers.length; i++) {
-            if (test(numbers.filter((_, index) => index !== i))) {
+            if (test(splice(numbers, i))) {
                 return safe + 1;
             }
         }
