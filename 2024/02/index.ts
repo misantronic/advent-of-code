@@ -31,6 +31,10 @@ const test = (numbers: number[]) => {
         if (incTest && (diff < 0 || adjTest)) {
             incTest = false;
         }
+
+        if (!decTest && !incTest) {
+            return false;
+        }
     }
 
     return decTest || incTest;
