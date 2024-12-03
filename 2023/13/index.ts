@@ -2,26 +2,7 @@ import { lines, readFile } from '../utils';
 
 const input = readFile('./input-example.txt').split('\n\n').map(lines);
 
-const mapPattern = (arr: string[]) => {
-    const numPattern: number[] = [];
-
-    for (let i = 0; i < arr.length; i++) {
-        const line = arr[i];
-
-        for (let j = 0; j < arr.length; j++) {
-            const line2 = arr[j];
-
-            if (line === line2) {
-                numPattern[i] = i;
-                numPattern[j] = i;
-            }
-        }
-    }
-
-    return numPattern;
-};
-
-const getReflection = (pattern: number[]) => {
+const getReflection = (pattern: (string | number)[]) => {
     let reflection = 0;
     const middle: number[] = [];
 
@@ -76,22 +57,41 @@ const getPatterns = (yP: string[]) => {
         });
     }
 
-    const x = mapPattern(xP);
-    const y = mapPattern(yP);
-
-    return { x, y };
+    return { x: xP, y: yP };
 };
+
+const reflections = new Map<number, { x: number; y: number }>();
 
 console.log(
     'part 1',
-    input.reduce((p, yP) => {
+    input.reduce((p, yP, i) => {
         const { x, y } = getPatterns(yP);
 
         const xR = getReflection(x);
         const yR = getReflection(y);
 
-        // console.log({ x, y, xR, yR });
+        reflections.set(i, { x: xR, y: yR });
 
         return p + xR + yR * 100;
+    }, 0)
+);
+
+console.log(
+    'part 2',
+    input.reduce((p, yP, i) => {
+        const { x, y } = getPatterns(yP);
+
+        // get original reflection and exclude it
+        const p1Reflections = reflections.get(i);
+
+        const xR = getReflection(x);
+        const yR = getReflection(y);
+
+        const xR2 = xR === p1Reflections?.x ? 0 : xR;
+        const yR2 = yR === p1Reflections?.y ? 0 : yR;
+
+        // console.log({ x, y, xR, yR });
+
+        return p + xR2 + yR2 * 100;
     }, 0)
 );
