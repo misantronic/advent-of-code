@@ -1,8 +1,8 @@
 import { lines, readFile } from '../utils';
 
-const input = readFile('./input-example.txt').split('\n\n').map(lines);
+const input = readFile('./input.txt').split('\n\n').map(lines);
 
-const getReflection = (pattern: (string | number)[]) => {
+const getReflection = (pattern: string[]) => {
     let reflection = 0;
     const middle: number[] = [];
 
@@ -62,6 +62,7 @@ const getPatterns = (yP: string[]) => {
 
 const reflections = new Map<number, { x: number; y: number }>();
 
+console.time('part 1');
 console.log(
     'part 1',
     input.reduce((p, yP, i) => {
@@ -75,23 +76,56 @@ console.log(
         return p + xR + yR * 100;
     }, 0)
 );
+console.timeEnd('part 1');
 
+console.time('part 2');
 console.log(
     'part 2',
     input.reduce((p, yP, i) => {
-        const { x, y } = getPatterns(yP);
+        const p1Reflections = reflections.get(i) ?? { x: 0, y: 0 };
 
-        // get original reflection and exclude it
-        const p1Reflections = reflections.get(i);
+        let xR = 0;
+        let yR = 0;
 
-        const xR = getReflection(x);
-        const yR = getReflection(y);
+        loop: for (let j = 0; j < yP.length; j++) {
+            const line = yP[j];
 
-        const xR2 = xR === p1Reflections?.x ? 0 : xR;
-        const yR2 = yR === p1Reflections?.y ? 0 : yR;
+            for (let k = 0; k < line.length; k++) {
+                const yP2 = [...yP];
 
-        // console.log({ x, y, xR, yR });
+                yP2[j] =
+                    line.substring(0, k) +
+                    (line[k] === '.' ? '#' : '.') +
+                    line.substring(k + 1);
 
-        return p + xR2 + yR2 * 100;
+                const { x, y } = getPatterns(yP2);
+
+                const newXR = getReflection(x);
+                const newYR = getReflection(y);
+
+                if (newXR !== p1Reflections.x) {
+                    xR = newXR;
+                }
+
+                if (newYR !== p1Reflections.y) {
+                    yR = newYR;
+                }
+
+                if (xR !== 0 || yR !== 0) {
+                    break loop;
+                }
+            }
+        }
+
+        if (xR === 0 && yR === 0) {
+            xR = p1Reflections.x;
+            yR = p1Reflections.y;
+        }
+
+        return p + xR + yR * 100;
     }, 0)
 );
+console.timeEnd('part 2');
+
+// 34645 too low
+// 52686 too high
