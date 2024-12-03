@@ -1,6 +1,6 @@
 import { lines, readFile } from '../utils';
 
-const input = readFile('./input.txt').split('\n\n').map(lines);
+const input = readFile('./input-example.txt').split('\n\n').map(lines);
 
 const mapPattern = (arr: string[]) => {
     const numPattern: number[] = [];
@@ -63,26 +63,34 @@ const getReflection = (pattern: number[]) => {
     return reflection;
 };
 
+const getPatterns = (yP: string[]) => {
+    const xP: string[] = [];
+
+    for (let i = 0; i < yP.length; i++) {
+        yP[i].split('').map((char, j) => {
+            if (!xP[j]) {
+                xP[j] = '';
+            }
+
+            xP[j] = `${xP[j]}${char}`;
+        });
+    }
+
+    const x = mapPattern(xP);
+    const y = mapPattern(yP);
+
+    return { x, y };
+};
+
 console.log(
     'part 1',
     input.reduce((p, yP) => {
-        const xP: string[] = [];
-
-        for (let i = 0; i < yP.length; i++) {
-            yP[i].split('').map((char, j) => {
-                if (!xP[j]) {
-                    xP[j] = '';
-                }
-
-                xP[j] = `${xP[j]}${char}`;
-            });
-        }
-
-        const x = mapPattern(xP);
-        const y = mapPattern(yP);
+        const { x, y } = getPatterns(yP);
 
         const xR = getReflection(x);
         const yR = getReflection(y);
+
+        // console.log({ x, y, xR, yR });
 
         return p + xR + yR * 100;
     }, 0)
