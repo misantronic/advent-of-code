@@ -1,8 +1,8 @@
 import { lines, readFile } from '../utils';
 
-const input = readFile('./input-example.txt').split('\n\n').map(lines);
+const input = readFile('./input.txt').split('\n\n').map(lines);
 
-const findPattern = (arr: string[]) => {
+const mapPattern = (arr: string[]) => {
     const numPattern: number[] = [];
 
     for (let i = 0; i < arr.length; i++) {
@@ -22,23 +22,41 @@ const findPattern = (arr: string[]) => {
 };
 
 const getReflection = (pattern: number[]) => {
-    const reflection: number[] = [];
+    let reflection = 0;
+    const middle: number[] = [];
 
+    // find middle
     for (let i = 0; i < pattern.length; i++) {
         const curr = pattern[i];
+        const prev = pattern[i - 1];
 
-        if (curr === 0) {
-            continue;
+        if (curr === prev) {
+            middle.push(i - 1);
+        }
+    }
+
+    // find reflection
+    for (let i = 0; i < middle.length; i++) {
+        const lIndex = middle[i];
+        const rIndex = lIndex + 1;
+
+        let len = 1;
+
+        while (true) {
+            const leftO = pattern[lIndex - len];
+            const rightO = pattern[rIndex + len];
+
+            if (leftO === rightO) {
+                len++;
+            } else {
+                break;
+            }
         }
 
-        if (reflection.length === 0) {
-            reflection.push(curr);
-        } else {
-            const prev = pattern[pattern.length - 1];
+        const lValue = lIndex + 1;
 
-            if (prev <= curr) {
-                reflection.push(curr);
-            }
+        if (lValue - len === 0 || rIndex + len === pattern.length) {
+            reflection = lValue;
         }
     }
 
@@ -47,36 +65,25 @@ const getReflection = (pattern: number[]) => {
 
 console.log(
     'part 1',
-    input.reduce((acc, yPatternArr) => {
-        const xPatternArr: string[] = [];
+    input.reduce((p, yP) => {
+        const xP: string[] = [];
 
-        for (let i = 0; i < yPatternArr.length; i++) {
-            yPatternArr[i].split('').map((char, j) => {
-                if (!xPatternArr[j]) {
-                    xPatternArr[j] = '';
+        for (let i = 0; i < yP.length; i++) {
+            yP[i].split('').map((char, j) => {
+                if (!xP[j]) {
+                    xP[j] = '';
                 }
 
-                xPatternArr[j] = `${xPatternArr[j]}${char}`;
+                xP[j] = `${xP[j]}${char}`;
             });
         }
 
-        const xPattern = findPattern(xPatternArr);
-        const yPattern = findPattern(yPatternArr);
+        const x = mapPattern(xP);
+        const y = mapPattern(yP);
 
-        const xReflection = getReflection(xPattern);
-        const yReflection = getReflection(yPattern);
+        const xR = getReflection(x);
+        const yR = getReflection(y);
 
-        console.log('x', xPattern, xReflection);
-        console.log('y', yPattern, yReflection);
-        console.log('--');
-
-        if (xReflection.length > yReflection.length) {
-            return acc + xReflection.length;
-        }
-
-        return acc + yReflection.length * 100;
+        return p + xR + yR * 100;
     }, 0)
 );
-
-// 36324 too low
-// 38577 too high
