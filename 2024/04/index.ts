@@ -83,9 +83,7 @@ function part1() {
             if (cell === 'X') {
                 const xP: P = { x, y };
 
-                const mLetters = findLetters('M', xP);
-
-                mLetters.forEach((mP) => {
+                findLetters('M', xP).forEach((mP) => {
                     const aP = findInDirection('A', mP, {
                         x: mP.x - xP.x,
                         y: mP.y - xP.y
