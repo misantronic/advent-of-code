@@ -121,10 +121,12 @@ let loops = 0;
 
 for (let y = 0; y < grid.length; y++) {
     for (let x = 0; x < grid[y].length; x++) {
-        const { loop } = createLoop({ x, y, c: '#' });
+        if (visited.has(`${x},${y}`)) {
+            const { loop } = createLoop({ x, y, c: '#' });
 
-        if (loop) {
-            loops++;
+            if (loop) {
+                loops++;
+            }
         }
     }
 }
