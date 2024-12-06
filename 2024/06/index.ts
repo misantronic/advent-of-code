@@ -25,10 +25,11 @@ function createLoop(c?: C) {
 }
 
 function loop(grid: string[][]) {
-    let g: G = { x: 0, y: 0, d: '^' };
+    let g: G = { x: -1, y: -1, d: '^' };
     const visited: Set<string> = new Set();
-    const dVisited: G[] = [];
-    let dVisitedDoubled: string[] = [];
+    const gVisited: G[] = [];
+
+    const numO = grid.flat().filter((c) => c === '#').length;
 
     // find starting point
     for (let y = 0; y < grid.length; y++) {
@@ -37,13 +38,18 @@ function loop(grid: string[][]) {
         if (x !== -1) {
             g = { x, y, d: '^' };
             visited.add(`${x},${y}`);
-            dVisited.push(g);
+            gVisited.push(g);
             grid[y][x] = '.';
             break;
         }
     }
 
     while (true) {
+        // not quite sure how to detect a loop
+        if (gVisited.length >= numO * 2) {
+            return { loop: true, visited, grid };
+        }
+
         const nextC = ((): C => {
             switch (g.d) {
                 case '^':
@@ -74,63 +80,40 @@ function loop(grid: string[][]) {
         })();
 
         if (!nextC.c) {
-            break;
+            // out of bounds
+            return { loop: false, visited, grid };
         }
 
         const nextG = { ...g };
 
-        switch (nextC.c) {
-            case '#':
-                if (dVisited.some((g) => g.x === nextG.x && g.y === nextG.y)) {
-                    dVisitedDoubled.push(`${nextG.x},${nextG.y}`);
+        if (nextC.c === '.') {
+            nextG.x = nextC.x;
+            nextG.y = nextC.y;
+        }
 
-                    // TODO: better check all the visited points
-                    if (dVisitedDoubled.length === 5) {
-                        return {
-                            error: !dVisitedDoubled.every(
-                                (x, i, arr) => x === arr[0]
-                            ),
-                            visited,
-                            dVisited,
-                            grid
-                        };
-                    }
-                }
+        if (nextC.c === '#') {
+            gVisited.push(nextG);
 
-                dVisited.push(nextG);
-
-                switch (g.d) {
-                    case '^':
-                        nextG.d = '>';
-                        break;
-                    case '>':
-                        nextG.d = 'v';
-                        break;
-                    case 'v':
-                        nextG.d = '<';
-                        break;
-                    case '<':
-                        nextG.d = '^';
-                        break;
-                }
-                break;
-            case '.':
-                nextG.x = nextC.x;
-                nextG.y = nextC.y;
-                break;
+            if (g.d === '^') {
+                nextG.d = '>';
+            } else if (g.d === '>') {
+                nextG.d = 'v';
+            } else if (g.d === 'v') {
+                nextG.d = '<';
+            } else if (g.d === '<') {
+                nextG.d = '^';
+            }
         }
 
         visited.add(`${nextG.x},${nextG.y}`);
 
         g = nextG;
     }
-
-    return { error: false, visited, dVisited, grid };
 }
 
-const part1 = createLoop();
+const { visited } = createLoop();
 
-console.log('part 1:', part1.visited.size);
+console.log('part 1:', visited.size);
 
 console.time('part 2');
 
@@ -138,9 +121,9 @@ let loops = 0;
 
 for (let y = 0; y < grid.length; y++) {
     for (let x = 0; x < grid[y].length; x++) {
-        const { error } = createLoop({ x, y, c: '#' });
+        const { loop } = createLoop({ x, y, c: '#' });
 
-        if (error) {
+        if (loop) {
             loops++;
         }
     }
