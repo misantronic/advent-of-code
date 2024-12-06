@@ -14,10 +14,10 @@ interface C {
     c: '.' | '#';
 }
 
-function createLoop(c: C) {
+function createLoop(c?: C) {
     const gridCopy = grid.map((row, y) =>
         row.map((c2, x) => {
-            return c.x === x && c.y === y ? '#' : c2;
+            return c?.x === x && c?.y === y ? '#' : c2;
         })
     );
 
@@ -128,7 +128,7 @@ function loop(grid: string[][]) {
     return { error: false, visited, dVisited, grid };
 }
 
-const part1 = loop(grid.map((row) => [...row]));
+const part1 = createLoop();
 
 console.log('part 1:', part1.visited.size);
 
