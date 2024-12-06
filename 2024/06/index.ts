@@ -14,63 +14,6 @@ interface C {
     c: '.' | '#';
 }
 
-function draw(grid: string[][], visited: Set<string>) {
-    for (let y = 0; y < grid.length; y++) {
-        let line = '';
-        for (let x = 0; x < grid[y].length; x++) {
-            if (visited.has(`${x},${y}`)) {
-                line += 'o';
-            } else {
-                line += grid[y][x];
-            }
-        }
-        console.log(line);
-    }
-    console.log();
-}
-
-function findOx(g1: G, g2: G): C[] {
-    const found: C[] = [];
-    const start = (g1.x > g2.x ? g2.x : g1.x) + 1;
-    const end = g1.x > g2.x ? g1.x : g2.x;
-
-    for (let y = 0; y < grid.length; y++) {
-        for (let x = start; x < end; x++) {
-            if (grid[y][x] === '#') {
-                found.push({
-                    x: g1.d === '>' ? x + 1 : x - 1,
-                    y: g1.y,
-                    c: '#'
-                });
-            }
-        }
-    }
-
-    return found;
-}
-
-function findOy(g1: G, g2: G): C[] {
-    const found: C[] = [];
-    const start = (g1.y > g2.y ? g2.y : g1.y) + 1;
-    const end = g1.y > g2.y ? g1.y : g2.y;
-
-    for (let y = start; y < end; y++) {
-        for (let x = 0; x < grid[y].length; x++) {
-            if (grid[y][x] === '#') {
-                if (Math.abs(g1.x - x) > 1) {
-                    found.push({
-                        x: g1.x,
-                        y: g1.d === 'v' ? y + 1 : y - 1,
-                        c: '#'
-                    });
-                }
-            }
-        }
-    }
-
-    return found;
-}
-
 function createLoop(c: C) {
     const gridCopy = grid.map((row, y) =>
         row.map((c2, x) => {
@@ -141,7 +84,8 @@ function loop(grid: string[][]) {
                 if (dVisited.some((g) => g.x === nextG.x && g.y === nextG.y)) {
                     dVisitedDoubled.push(`${nextG.x},${nextG.y}`);
 
-                    if (dVisitedDoubled.length === 100) {
+                    // TODO: better check all the visited points
+                    if (dVisitedDoubled.length === 5) {
                         return {
                             error: !dVisitedDoubled.every(
                                 (x, i, arr) => x === arr[0]
@@ -188,60 +132,19 @@ const part1 = loop(grid.map((row) => [...row]));
 
 console.log('part 1:', part1.visited.size);
 
-// draw(part1.grid, new Set());
-
 console.time('part 2');
 
-const { dVisited, visited } = part1;
-const loops = new Set<string>();
+let loops = 0;
 
-const lastVisited = Array.from(visited).pop();
+for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y].length; x++) {
+        const { error } = createLoop({ x, y, c: '#' });
 
-const p2DVisited: G[] = [
-    ...dVisited,
-    {
-        x: Number(lastVisited?.split(',')[0]),
-        y: Number(lastVisited?.split(',')[1]),
-        d: '^'
-    }
-];
-
-for (let i = 0; i < p2DVisited.length; i++) {
-    const g1 = p2DVisited[i];
-    const g2 = p2DVisited[i + 1];
-
-    if (!g2) {
-        continue;
-    }
-
-    if (g1.y === g2.y) {
-        // console.log('testing', g1, g2);
-        for (const c of findOx(g1, g2)) {
-            // console.log('found', c);
-
-            const res = createLoop(c);
-
-            if (res.error) {
-                // draw(res.grid, res.visited);
-                loops.add([...res.visited].join(''));
-            }
-        }
-    }
-
-    if (g1.x === g2.x) {
-        // console.log('testing', g1, g2);
-        for (const c of findOy(g1, g2)) {
-            const res = createLoop(c);
-
-            if (res.error) {
-                // draw(res.grid, res.visited);
-                loops.add([...res.visited].join(''));
-            }
+        if (error) {
+            loops++;
         }
     }
 }
 
-// draw(grid, [...loops][0]);
-
-console.log('part 2', loops.size);
+console.log('part 2', loops);
 console.timeEnd('part 2');
