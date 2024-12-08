@@ -1,14 +1,32 @@
 import { lines, readFile } from '../utils';
 
-const input = lines(readFile('./input.txt')).map((line) => {
+const input = lines(readFile('./input-example.txt')).map((line) => {
     const match = line.match(/^([RDLU]) (\d+) \((#[a-z0-9]+)\)$/);
+    const rawHex = match?.[3]!;
+    const hex = rawHex.substring(1, 6)!;
+    const d = ((): 'R' | 'D' | 'L' | 'U' => {
+        const id = rawHex.substring(rawHex.length - 1);
+
+        if (id === '0') {
+            return 'R';
+        } else if (id === '1') {
+            return 'D';
+        } else if (id === '2') {
+            return 'L';
+        } else {
+            return 'U';
+        }
+    })();
 
     return {
-        d: match?.[1]! as 'R' | 'D' | 'L' | 'U',
-        n: Number(match?.[2]),
-        hex: match?.[3]!
+        d,
+        n: hexToNumber(hex)
     };
 });
+
+function hexToNumber(hex: string): number {
+    return parseInt(hex, 16);
+}
 
 interface P {
     x: number;
@@ -16,7 +34,6 @@ interface P {
 }
 
 const boundaries = new Set<string>();
-const space = new Set<string>();
 
 let p: P = { x: 0, y: 0 };
 let outer = 0;
@@ -71,17 +88,12 @@ const maxY = [...boundaries].reduce(
     -Infinity
 );
 
-for (let y = minY; y <= maxY; y++) {
-    for (let x = minX; x <= maxX; x++) {
-        space.add(`${x},${y}`);
-    }
-}
-
 const points = [...boundaries].map<P>((p) => {
     const [x, y] = p.split(',').map(Number);
     return { x, y };
 });
 
+// @see https://de.wikipedia.org/wiki/Gau%C3%9Fsche_Trapezformel
 function isPointInPolygon(point: P): boolean {
     const { x: px, y: py } = point;
     let inside = false;
