@@ -34,16 +34,15 @@ const linearEquation = ({
     buttonB: P;
     price: P;
 }) => {
-    // linear equation
-    const factor1 = buttonA.y / buttonA.x;
-    const b = buttonB.y - factor1 * buttonB.x;
-    const c = price.y - factor1 * price.x;
+    const factor = buttonA.y / buttonA.x;
+    const e = buttonB.y - factor * buttonB.x;
+    const f = price.y - factor * price.x;
 
-    const numB = Math.round((c / b) * 100) / 100;
-    const numA = (price.x - buttonB.x * numB) / buttonA.x;
+    const b = Math.round((f / e) * 100) / 100;
+    const a = (price.x - buttonB.x * b) / buttonA.x;
 
-    if (numA % 1 === 0 && numB % 1 === 0) {
-        return numA * 3 + numB * 1;
+    if (a % 1 === 0 && b % 1 === 0) {
+        return a * 3 + b * 1;
     }
 
     return 0;
