@@ -328,8 +328,13 @@ function part2(moves: D[]) {
     console.log('part 2:', total);
 }
 
+console.time('part1');
 part1(
     grid.map((line) => [...line]),
     [...moves]
 );
+console.timeEnd('part1');
+
+console.time('part2');
 part2([...moves]);
+console.timeEnd('part2');
