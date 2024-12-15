@@ -41,14 +41,6 @@ function draw(grid: string[][]) {
     console.log();
 }
 
-function validate(grid: string[][]) {
-    for (let y = 0; y < grid.length; y++) {
-        if (/\]\]|\[\[/.test(grid[y].join(''))) {
-            throw new Error('Invalid grid');
-        }
-    }
-}
-
 function part1(grid: string[][], moves: D[]) {
     let move!: D;
     let robot: P = { x: 0, y: 0 };
@@ -124,8 +116,6 @@ function part2(moves: D[]) {
             .replace(/\./g, '..')
             .replace(/@/g, '@.')
     ).map((line) => line.split(''));
-
-    draw(grid);
 
     let move!: D;
     let robot: P = { x: 0, y: 0 };
@@ -272,7 +262,7 @@ function part2(moves: D[]) {
                 }
 
                 if (moveBoxes) {
-                    const lastBoxes = boxes.slice(-2);
+                    const lastBoxes = boxes.slice(-3);
 
                     if (move === 'v' || move === '^') {
                         if (
@@ -325,10 +315,6 @@ function part2(moves: D[]) {
 
     let total = 0;
 
-    // FIXME
-    // grid[24][27] = '[';
-    // grid[24][28] = ']';
-
     for (let y = 0; y < grid.length; y++) {
         for (let x = 0; x < grid[y].length; x++) {
             if (grid[y][x] === '[') {
@@ -338,7 +324,6 @@ function part2(moves: D[]) {
     }
 
     draw(grid);
-    validate(grid);
 
     console.log('part 2:', total);
 }
