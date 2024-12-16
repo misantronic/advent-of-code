@@ -1,22 +1,6 @@
 import { lines, readFile } from '../utils';
 
-// grid looks like this:
-// ###############
-// #.......#....E#
-// #.#.###.#.###.#
-// #.....#.#...#.#
-// #.###.#####.#.#
-// #.#.#.......#.#
-// #.#.#####.###.#
-// #...........#.#
-// ###.#.#####.#.#
-// #...#.....#.#.#
-// #.#.#.###.#.#.#
-// #.....#...#.#.#
-// #.###.#.#.#.#.#
-// #S..#.....#...#
-// ###############
-const grid = lines(readFile('./input-example.txt')).map(
+const grid = lines(readFile('./input-example2.txt')).map(
     (line) => line.split('') as ('.' | '#' | 'S' | 'E')[]
 );
 
@@ -46,6 +30,7 @@ type State = {
     position: [number, number];
     direction: number;
     cost: number;
+    visited?: Set<string>;
 };
 
 const dijkstra = () => {
@@ -98,10 +83,100 @@ const dijkstra = () => {
     return -1;
 };
 
+const findShortestPaths = (lowestCost: number) => {
+    const queue: State[] = [
+        {
+            position: S,
+            direction: 1,
+            cost: 0,
+            visited: new Set<string>()
+        }
+    ];
+    const tiles = new Set<string>();
+
+    while (queue.length > 0) {
+        const {
+            position: [x, y],
+            direction,
+            cost,
+            visited
+        } = queue.shift()!;
+
+        if (cost > lowestCost) {
+            continue;
+        }
+
+        if (x === E[0] && y === E[1] && cost === lowestCost) {
+            for (const v of visited!) {
+                const [vx, vy] = v.split(',');
+
+                tiles.add(`${vx},${vy}`);
+            }
+
+            tiles.add(`${x},${y}`);
+
+            continue;
+        }
+
+        const key = `${x},${y},${direction}`;
+
+        if (visited?.has(key)) continue;
+
+        const newVisited = new Set([...visited!, key]);
+
+        const [dx, dy] = directions[direction];
+        const newX = x + dx;
+        const newY = y + dy;
+
+        // console.log(key, cost);
+
+        const movementCost = cost + 1;
+
+        if (grid[newY][newX] !== '#' && movementCost <= lowestCost) {
+            queue.push({
+                position: [newX, newY],
+                direction,
+                cost: movementCost,
+                visited: newVisited
+            });
+        }
+
+        const rotationCost = cost + 1000;
+        const leftRotation = (direction + 3) % 4;
+        const rightRotation = (direction + 1) % 4;
+
+        if (rotationCost <= lowestCost) {
+            if (!visited!.has(`${x},${y},${leftRotation}`)) {
+                // Rotate left
+                queue.push({
+                    position: [x, y],
+                    direction: leftRotation,
+                    cost: rotationCost,
+                    visited: newVisited
+                });
+            }
+
+            if (!visited!.has(`${x},${y},${rightRotation}`)) {
+                // Rotate right
+                queue.push({
+                    position: [x, y],
+                    direction: rightRotation,
+                    cost: rotationCost,
+                    visited: newVisited
+                });
+            }
+        }
+    }
+
+    return tiles.size;
+};
+
 console.time('part 1');
-console.log('part 1:', dijkstra());
+const lowestCost = dijkstra();
+
+console.log('part 1:', lowestCost);
 console.timeEnd('part 1');
 
-// console.time('part 2');
-// console.log('part 2:', findAllPaths());
-// console.timeEnd('part 2');
+console.time('part 2');
+console.log('part 2:', findShortestPaths(lowestCost));
+console.timeEnd('part 2');
