@@ -1,6 +1,6 @@
-import { lines, readFile } from '../utils';
+import { lines, PriorityQueue, readFile } from '../utils';
 
-const grid = lines(readFile('./input-example2.txt')).map(
+const grid = lines(readFile('./input-example.txt')).map(
     (line) => line.split('') as ('.' | '#' | 'S' | 'E')[]
 );
 
@@ -34,18 +34,18 @@ type State = {
 };
 
 const dijkstra = () => {
-    const queue: State[] = [{ position: S, direction: 1, cost: 0 }];
+    const queue = new PriorityQueue<State>();
+
+    queue.enqueue({ position: S, direction: 1, cost: 0 }, 0);
+
     const visited = new Set<string>();
 
-    while (queue.length > 0) {
-        // Sort the queue based on cost to simulate priority queue behavior
-        queue.sort((a, b) => a.cost - b.cost);
-
+    while (!queue.isEmpty()) {
         const {
             position: [x, y],
             direction,
             cost
-        } = queue.shift()!;
+        } = queue.dequeue()!;
 
         if (x === E[0] && y === E[1]) {
             return cost;
@@ -62,45 +62,57 @@ const dijkstra = () => {
         const newY = y + dy;
 
         if (grid[newY][newX] !== '#') {
-            queue.push({ position: [newX, newY], direction, cost: cost + 1 });
+            queue.enqueue(
+                { position: [newX, newY], direction, cost: cost + 1 },
+                cost + 1
+            );
         }
 
         // Rotate left
-        queue.push({
-            position: [x, y],
-            direction: (direction + 3) % 4,
-            cost: cost + 1000
-        });
+        queue.enqueue(
+            {
+                position: [x, y],
+                direction: (direction + 3) % 4,
+                cost: cost + 1000
+            },
+            cost + 1000
+        );
 
         // Rotate right
-        queue.push({
-            position: [x, y],
-            direction: (direction + 1) % 4,
-            cost: cost + 1000
-        });
+        queue.enqueue(
+            {
+                position: [x, y],
+                direction: (direction + 1) % 4,
+                cost: cost + 1000
+            },
+            cost + 1000
+        );
     }
 
     return -1;
 };
 
 const findShortestPaths = (lowestCost: number) => {
-    const queue: State[] = [
+    const queue = new PriorityQueue<State>();
+
+    queue.enqueue(
         {
             position: S,
             direction: 1,
             cost: 0,
             visited: new Set<string>()
-        }
-    ];
+        },
+        0
+    );
     const tiles = new Set<string>();
 
-    while (queue.length > 0) {
+    while (!queue.isEmpty()) {
         const {
             position: [x, y],
             direction,
             cost,
             visited
-        } = queue.shift()!;
+        } = queue.dequeue()!;
 
         if (cost > lowestCost) {
             continue;
@@ -122,23 +134,26 @@ const findShortestPaths = (lowestCost: number) => {
 
         if (visited?.has(key)) continue;
 
-        const newVisited = new Set([...visited!, key]);
+        const newVisited = new Set(visited);
+
+        newVisited.add(key);
 
         const [dx, dy] = directions[direction];
         const newX = x + dx;
         const newY = y + dy;
 
-        // console.log(key, cost);
-
         const movementCost = cost + 1;
 
         if (grid[newY][newX] !== '#' && movementCost <= lowestCost) {
-            queue.push({
-                position: [newX, newY],
-                direction,
-                cost: movementCost,
-                visited: newVisited
-            });
+            queue.enqueue(
+                {
+                    position: [newX, newY],
+                    direction,
+                    cost: movementCost,
+                    visited: newVisited
+                },
+                movementCost
+            );
         }
 
         const rotationCost = cost + 1000;
@@ -148,22 +163,28 @@ const findShortestPaths = (lowestCost: number) => {
         if (rotationCost <= lowestCost) {
             if (!visited!.has(`${x},${y},${leftRotation}`)) {
                 // Rotate left
-                queue.push({
-                    position: [x, y],
-                    direction: leftRotation,
-                    cost: rotationCost,
-                    visited: newVisited
-                });
+                queue.enqueue(
+                    {
+                        position: [x, y],
+                        direction: leftRotation,
+                        cost: rotationCost,
+                        visited: newVisited
+                    },
+                    rotationCost
+                );
             }
 
             if (!visited!.has(`${x},${y},${rightRotation}`)) {
                 // Rotate right
-                queue.push({
-                    position: [x, y],
-                    direction: rightRotation,
-                    cost: rotationCost,
-                    visited: newVisited
-                });
+                queue.enqueue(
+                    {
+                        position: [x, y],
+                        direction: rightRotation,
+                        cost: rotationCost,
+                        visited: newVisited
+                    },
+                    rotationCost
+                );
             }
         }
     }
