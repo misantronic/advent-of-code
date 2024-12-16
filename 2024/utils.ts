@@ -13,6 +13,12 @@ export function lines(input: string) {
 export class PriorityQueue<T> {
     private heap: Array<{ item: T; priority: number }> = [];
 
+    constructor(items: Array<{ item: T; priority: number }> = []) {
+        items.forEach(({ item, priority }) => {
+            this.enqueue(item, priority);
+        });
+    }
+
     private getParentIndex(index: number): number {
         return Math.floor((index - 1) / 2);
     }

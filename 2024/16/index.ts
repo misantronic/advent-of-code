@@ -1,6 +1,6 @@
 import { lines, PriorityQueue, readFile } from '../utils';
 
-const grid = lines(readFile('./input.txt')).map(
+const grid = lines(readFile('./input-example.txt')).map(
     (line) => line.split('') as ('.' | '#' | 'S' | 'E')[]
 );
 
@@ -93,17 +93,18 @@ const dijkstra = () => {
 };
 
 const findShortestPaths = (lowestCost: number) => {
-    const queue = new PriorityQueue<State>();
-
-    queue.enqueue(
+    const queue = new PriorityQueue<State>([
         {
-            position: S,
-            direction: 1,
-            cost: 0,
-            visited: new Set<string>()
-        },
-        0
-    );
+            item: {
+                position: S,
+                direction: 1,
+                cost: 0,
+                visited: new Set<string>()
+            },
+            priority: 0
+        }
+    ]);
+
     const tiles = new Set<string>();
 
     while (!queue.isEmpty()) {
