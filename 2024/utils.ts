@@ -86,6 +86,10 @@ export class PriorityQueue<T> {
         return item;
     }
 
+    public get length() {
+        return this.heap.length;
+    }
+
     public peek(): T | undefined {
         return this.heap[0]?.item;
     }
