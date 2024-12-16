@@ -1,6 +1,6 @@
 import { lines, PriorityQueue, readFile } from '../utils';
 
-const grid = lines(readFile('./input-example.txt')).map(
+const grid = lines(readFile('./input-example2.txt')).map(
     (line) => line.split('') as ('.' | '#' | 'S' | 'E')[]
 );
 
@@ -163,26 +163,27 @@ const findShortestPaths = (lowestCost: number) => {
         }
 
         const rotationCost = cost + 1000;
-        const leftRotation = (direction + 3) % 4;
-        const rightRotation = (direction + 1) % 4;
 
         if (rotationCost <= lowestCost) {
+            const leftRotation = (direction + 3) % 4;
+            const rightRotation = (direction + 1) % 4;
+
             const [ldX, ldY] = directions[leftRotation];
             const [lrX, lrY] = [x + ldX, y + ldY];
 
             if (
-                !visited!.has(`${x},${y},${leftRotation}`) &&
+                !visited!.has(`${lrX},${lrY},${leftRotation}`) &&
                 grid[lrY][lrX] !== '#'
             ) {
-                // Rotate left
+                // Rotate left and move
                 queue.enqueue(
                     {
-                        position: [x, y],
+                        position: [lrX, lrY],
                         direction: leftRotation,
-                        cost: rotationCost,
+                        cost: rotationCost + 1,
                         visited: newVisited
                     },
-                    rotationCost
+                    rotationCost + 1
                 );
             }
 
@@ -190,18 +191,18 @@ const findShortestPaths = (lowestCost: number) => {
             const [rrX, rrY] = [x + rdX, y + rdY];
 
             if (
-                !visited!.has(`${x},${y},${rightRotation}`) &&
+                !visited!.has(`${rrX},${rrY},${rightRotation}`) &&
                 grid[rrY][rrX] !== '#'
             ) {
-                // Rotate right
+                // Rotate right and move
                 queue.enqueue(
                     {
-                        position: [x, y],
+                        position: [rrX, rrY],
                         direction: rightRotation,
-                        cost: rotationCost,
+                        cost: rotationCost + 1,
                         visited: newVisited
                     },
-                    rotationCost
+                    rotationCost + 1
                 );
             }
         }
