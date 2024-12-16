@@ -1,6 +1,6 @@
 import { lines, PriorityQueue, readFile } from '../utils';
 
-const grid = lines(readFile('./input-example2.txt')).map(
+const grid = lines(readFile('./input.txt')).map(
     (line) => line.split('') as ('.' | '#' | 'S' | 'E')[]
 );
 
@@ -118,15 +118,16 @@ const findShortestPaths = (lowestCost: number) => {
             continue;
         }
 
-        if (x === E[0] && y === E[1] && cost === lowestCost) {
-            for (const v of visited!) {
-                const [vx, vy] = v.split(',');
+        if (x === E[0] && y === E[1]) {
+            if (cost === lowestCost) {
+                for (const v of visited!) {
+                    const [vx, vy] = v.split(',');
 
-                tiles.add(`${vx},${vy}`);
+                    tiles.add(`${vx},${vy}`);
+                }
+
+                tiles.add(`${x},${y}`);
             }
-
-            tiles.add(`${x},${y}`);
-
             continue;
         }
 
