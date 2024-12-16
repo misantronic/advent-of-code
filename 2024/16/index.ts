@@ -4,7 +4,7 @@ const input1 = readFile('./input-example.txt');
 const input2 = readFile('./input-example2.txt');
 const input3 = readFile('./input.txt');
 
-[input1].forEach((c) => {
+[input1, input2, input3].forEach((c) => {
     const grid = lines(c).map(
         (line) => line.split('') as ('.' | '#' | 'S' | 'E')[]
     );
