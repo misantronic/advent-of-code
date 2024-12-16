@@ -121,6 +121,8 @@ const input3 = readFile('./input.txt');
                 visited
             } = queue.dequeue()!;
 
+            const key = `${x},${y}`;
+
             if (cost > lowestCost) {
                 continue;
             }
@@ -133,12 +135,10 @@ const input3 = readFile('./input.txt');
                         tiles.add(`${vx},${vy}`);
                     }
 
-                    tiles.add(`${x},${y}`);
+                    tiles.add(key);
                 }
                 continue;
             }
-
-            const key = `${x},${y}`;
 
             const prevCost = lowestCosts.get(key) ?? Infinity;
 
