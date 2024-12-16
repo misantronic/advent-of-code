@@ -110,6 +110,7 @@ const input3 = readFile('./input.txt');
             }
         ]);
 
+        const lowestCosts = new Map<string, number>();
         const tiles = new Set<string>();
 
         while (!queue.isEmpty()) {
@@ -139,6 +140,12 @@ const input3 = readFile('./input.txt');
 
             const key = `${x},${y}`;
 
+            const prevCost = lowestCosts.get(key) ?? Infinity;
+
+            if (prevCost < cost) {
+                continue;
+            }
+
             const newVisited = new Set(visited);
 
             newVisited.add(key);
@@ -149,11 +156,9 @@ const input3 = readFile('./input.txt');
 
             const movementCost = cost + 1;
 
-            if (
-                !visited?.has(`${newX},${newY}`) &&
-                grid[newY][newX] !== '#' &&
-                movementCost <= lowestCost
-            ) {
+            if (grid[newY][newX] !== '#' && movementCost <= lowestCost) {
+                lowestCosts.set(key, movementCost);
+
                 queue.enqueue(
                     {
                         position: [newX, newY],
@@ -174,7 +179,9 @@ const input3 = readFile('./input.txt');
                 const [ldX, ldY] = directions[leftRotation];
                 const [lrX, lrY] = [x + ldX, y + ldY];
 
-                if (!visited!.has(`${lrX},${lrY}`) && grid[lrY][lrX] !== '#') {
+                if (grid[lrY][lrX] !== '#') {
+                    lowestCosts.set(key, rotationCost + 1);
+
                     // Rotate left and move
                     queue.enqueue(
                         {
@@ -190,7 +197,9 @@ const input3 = readFile('./input.txt');
                 const [rdX, rdY] = directions[rightRotation];
                 const [rrX, rrY] = [x + rdX, y + rdY];
 
-                if (!visited!.has(`${rrX},${rrY}`) && grid[rrY][rrX] !== '#') {
+                if (grid[rrY][rrX] !== '#') {
+                    lowestCosts.set(key, rotationCost + 1);
+
                     // Rotate right and move
                     queue.enqueue(
                         {
