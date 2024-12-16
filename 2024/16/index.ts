@@ -137,9 +137,7 @@ const input3 = readFile('./input.txt');
                 continue;
             }
 
-            const key = `${x},${y},${direction}`;
-
-            if (visited?.has(key)) continue;
+            const key = `${x},${y}`;
 
             const newVisited = new Set(visited);
 
@@ -152,7 +150,7 @@ const input3 = readFile('./input.txt');
             const movementCost = cost + 1;
 
             if (
-                !visited!.has(`${newX},${newY},${direction}`) &&
+                !visited?.has(`${newX},${newY}`) &&
                 grid[newY][newX] !== '#' &&
                 movementCost <= lowestCost
             ) {
@@ -176,10 +174,7 @@ const input3 = readFile('./input.txt');
                 const [ldX, ldY] = directions[leftRotation];
                 const [lrX, lrY] = [x + ldX, y + ldY];
 
-                if (
-                    !visited!.has(`${lrX},${lrY},${leftRotation}`) &&
-                    grid[lrY][lrX] !== '#'
-                ) {
+                if (!visited!.has(`${lrX},${lrY}`) && grid[lrY][lrX] !== '#') {
                     // Rotate left and move
                     queue.enqueue(
                         {
@@ -195,10 +190,7 @@ const input3 = readFile('./input.txt');
                 const [rdX, rdY] = directions[rightRotation];
                 const [rrX, rrY] = [x + rdX, y + rdY];
 
-                if (
-                    !visited!.has(`${rrX},${rrY},${rightRotation}`) &&
-                    grid[rrY][rrX] !== '#'
-                ) {
+                if (!visited!.has(`${rrX},${rrY}`) && grid[rrY][rrX] !== '#') {
                     // Rotate right and move
                     queue.enqueue(
                         {
