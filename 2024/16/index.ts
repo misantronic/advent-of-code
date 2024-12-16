@@ -1,6 +1,6 @@
 import { lines, PriorityQueue, readFile } from '../utils';
 
-const grid = lines(readFile('./input-example.txt')).map(
+const grid = lines(readFile('./input-example2.txt')).map(
     (line) => line.split('') as ('.' | '#' | 'S' | 'E')[]
 );
 
@@ -144,7 +144,11 @@ const findShortestPaths = (lowestCost: number) => {
 
         const movementCost = cost + 1;
 
-        if (grid[newY][newX] !== '#' && movementCost <= lowestCost) {
+        if (
+            !visited!.has(`${newX},${newY},${direction}`) &&
+            grid[newY][newX] !== '#' &&
+            movementCost <= lowestCost
+        ) {
             queue.enqueue(
                 {
                     position: [newX, newY],
