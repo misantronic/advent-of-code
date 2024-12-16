@@ -1,6 +1,6 @@
 import { lines, readFile } from '../utils';
 
-const [rawGrid, rawMoves] = readFile('./input.txt').split('\n\n');
+const [rawGrid, rawMoves] = readFile('./input-example.txt').split('\n\n');
 
 const grid = lines(rawGrid).map((line) => line.split(''));
 let moves = rawMoves.split('\n').flatMap((line) => line.split('') as D[]);
@@ -33,12 +33,23 @@ const mapDirection = (d: D) => {
     }
 };
 
-function draw(grid: string[][]) {
-    for (let y = 0; y < grid.length; y++) {
-        console.log(grid[y].join(''));
-    }
+let drawDelay = 0;
 
-    console.log();
+function draw(grid: string[][]) {
+    drawDelay += 32;
+
+    const copyGrid = grid.map((line) => [...line]);
+
+    setTimeout(() => {
+        for (let y = 0; y < copyGrid.length; y++) {
+            process.stdout.write('\x1b[1A'); // Move the cursor up by one line
+            process.stdout.write('\x1b[2K'); // Clear the line
+        }
+
+        for (let y = 0; y < copyGrid.length; y++) {
+            console.log(copyGrid[y].join(''));
+        }
+    }, drawDelay);
 }
 
 function part1(grid: string[][], moves: D[]) {
@@ -90,9 +101,6 @@ function part1(grid: string[][], moves: D[]) {
             grid[robot.y][robot.x] = '.';
             robot = newRobotP;
         }
-
-        // console.log('move', move);
-        // draw();
     }
 
     let total = 0;
@@ -129,7 +137,6 @@ function part2(moves: D[]) {
         }
     }
 
-    let i = 0;
     while ((move = moves.shift()!)) {
         const d = mapDirection(move);
         const rx = robot.x + d.x;
@@ -309,8 +316,7 @@ function part2(moves: D[]) {
             grid[movedRobot.y][movedRobot.x] = '@';
             robot = movedRobot;
         }
-
-        i++;
+        draw(grid);
     }
 
     let total = 0;
@@ -322,8 +328,6 @@ function part2(moves: D[]) {
             }
         }
     }
-
-    draw(grid);
 
     console.log('part 2:', total);
 }
