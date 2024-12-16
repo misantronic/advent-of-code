@@ -161,7 +161,13 @@ const findShortestPaths = (lowestCost: number) => {
         const rightRotation = (direction + 1) % 4;
 
         if (rotationCost <= lowestCost) {
-            if (!visited!.has(`${x},${y},${leftRotation}`)) {
+            const [ldX, ldY] = directions[leftRotation];
+            const [lrX, lrY] = [x + ldX, y + ldY];
+
+            if (
+                !visited!.has(`${x},${y},${leftRotation}`) &&
+                grid[lrY][lrX] !== '#'
+            ) {
                 // Rotate left
                 queue.enqueue(
                     {
@@ -174,7 +180,13 @@ const findShortestPaths = (lowestCost: number) => {
                 );
             }
 
-            if (!visited!.has(`${x},${y},${rightRotation}`)) {
+            const [rdX, rdY] = directions[rightRotation];
+            const [rrX, rrY] = [x + rdX, y + rdY];
+
+            if (
+                !visited!.has(`${x},${y},${rightRotation}`) &&
+                grid[rrY][rrX] !== '#'
+            ) {
                 // Rotate right
                 queue.enqueue(
                     {
