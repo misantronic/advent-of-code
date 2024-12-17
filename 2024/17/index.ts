@@ -119,13 +119,13 @@ const input2 = readFile('./input.txt');
             const partialProgram = program.slice(i).join(',');
 
             while (true) {
-                const res = run(A);
+                const { output } = run(A);
 
-                if (res.output === program.join(',')) {
+                if (output === program.join(',')) {
                     return A;
                 }
 
-                if (res.output === partialProgram) {
+                if (output === partialProgram) {
                     break;
                 }
 
