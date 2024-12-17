@@ -114,7 +114,7 @@ const input2 = readFile('./input.txt');
         return { program, output: output.join(',') };
     }
 
-    function calc(program: number[]) {
+    function calcA(program: number[]) {
         return program.reduceRight((A, _, i) => {
             const newTarget = program.slice(i).join(',');
 
@@ -139,5 +139,5 @@ const input2 = readFile('./input.txt');
     const { program, output } = run();
 
     console.log('part 1:', output);
-    console.log('part 2:', calc(program));
+    console.log('part 2:', calcA(program));
 });
