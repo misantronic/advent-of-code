@@ -115,26 +115,25 @@ const input2 = readFile('./input.txt');
     }
 
     function calc(program: number[]) {
-        let A = 0n;
-
-        for (let i = program.length - 1; i >= 0; i--) {
-            A *= 8n;
-
+        return program.reduceRight((A, _, i) => {
             const newTarget = program.slice(i).join(',');
 
             while (true) {
-                const partialResult = run(A);
+                const res = run(A);
 
-                if (partialResult.output === program.join(',')) {
+                if (res.output === program.join(',')) {
                     return A;
                 }
 
-                if (partialResult.output === newTarget) {
+                if (res.output === newTarget) {
                     break;
                 }
+
                 A++;
             }
-        }
+
+            return A * 8n;
+        }, 0n);
     }
 
     const { program, output } = run();
