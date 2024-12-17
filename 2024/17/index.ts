@@ -136,8 +136,13 @@ const input2 = readFile('./input.txt');
         }, 0n);
     }
 
+    console.time('part 1');
     const { program, output } = run();
 
     console.log('part 1:', output);
+    console.timeEnd('part 1');
+
+    console.time('part 2');
     console.log('part 2:', calcA(program));
+    console.timeEnd('part 2');
 });
