@@ -116,7 +116,7 @@ const input2 = readFile('./input.txt');
 
     function calcA(program: number[]) {
         return program.reduceRight((A, _, i) => {
-            const newTarget = program.slice(i).join(',');
+            const partialProgram = program.slice(i).join(',');
 
             while (true) {
                 const res = run(A);
@@ -125,7 +125,7 @@ const input2 = readFile('./input.txt');
                     return A;
                 }
 
-                if (res.output === newTarget) {
+                if (res.output === partialProgram) {
                     break;
                 }
 
