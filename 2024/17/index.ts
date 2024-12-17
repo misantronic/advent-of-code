@@ -125,10 +125,11 @@ const input2 = readFile('./input.txt');
             while (true) {
                 const partialResult = run(A);
 
+                if (partialResult.output === program.join(',')) {
+                    return A;
+                }
+
                 if (partialResult.output === newTarget) {
-                    if (partialResult.output === program.join(',')) {
-                        return A;
-                    }
                     break;
                 }
                 A++;
