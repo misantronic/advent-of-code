@@ -3,7 +3,7 @@ import { lines, PriorityQueue, readFile } from '../utils';
 const input1 = './input-example.txt';
 const input2 = './input.txt';
 
-[input1, input2].forEach((name) => {
+[input1].forEach((name) => {
     const grid = lines(readFile(name)).map(
         (line) => line.split('') as ('.' | '#' | 'S' | 'E')[]
     );
@@ -37,22 +37,22 @@ const input2 = './input.txt';
     }
 
     const dijkstra = (grid: string[][], ignoreWall: number) => {
-        const queue = new PriorityQueue<[number, number, number]>([
-            { item: [S[0], S[1], 0], priority: 0 }
+        const queue = new PriorityQueue<[number, number, number, Set<string>]>([
+            { item: [S[0], S[1], 0, new Set()], priority: 0 }
         ]);
 
         const visited = new Set<string>();
 
         while (!queue.isEmpty()) {
-            const [x, y, cost] = queue.dequeue()!;
+            const [x, y, cost, path] = queue.dequeue()!;
 
             if (x === E[0] && y === E[1]) {
-                return cost;
+                return path;
             }
 
             for (const [dx, dy] of dirs) {
                 const [nx, ny] = [x + dx, y + dy];
-                const newCoord = `${nx},${ny}`;
+                const nxny = `${nx},${ny}`;
 
                 if (
                     walls[ignoreWall]?.[0] === nx &&
@@ -66,38 +66,36 @@ const input2 = './input.txt';
                         ny < 0 ||
                         ny >= grid.length ||
                         grid[ny][nx] === '#' ||
-                        visited.has(newCoord)
+                        visited.has(nxny)
                     ) {
                         continue;
                     }
                 }
 
-                queue.enqueue([nx, ny, cost + 1], cost + 1);
+                queue.enqueue(
+                    [nx, ny, cost + 1, new Set([...path, nxny])],
+                    cost + 1
+                );
 
-                visited.add(newCoord);
+                visited.add(nxny);
             }
         }
 
-        return -1;
+        throw new Error('No path found');
     };
 
-    console.time('part 1');
+    // console.time('part 1');
 
-    const base = dijkstra(grid, -1);
+    const path = dijkstra(grid, -1);
+    const base = path.size;
 
     console.log('base cost', base);
 
-    const costMap = new Map<number, number>();
+    const costMap = walls.reduce((map, _, i) => {
+        const save = base - dijkstra(grid, i).size;
 
-    walls.forEach((_, i) => {
-        const save = base - dijkstra(grid, i);
-
-        if (costMap.has(save)) {
-            costMap.set(save, costMap.get(save)! + 1);
-        } else {
-            costMap.set(save, 1);
-        }
-    });
+        return map.set(save, (map.get(save) ?? 0) + 1);
+    }, new Map<number, number>());
 
     let total = 0;
 
@@ -110,11 +108,13 @@ const input2 = './input.txt';
     console.log('part 1:', total);
     console.timeEnd('part 1');
 
-    // console.time('part 2');
-    // console.log('part 2:', findShortestPaths(lowestCost));
-    // console.timeEnd('part 2');
+    console.time('part 2');
+
+    console.log(path);
+    // const paths = findShortestPaths(base);
+
+    console.log('part 2:', 0);
+    console.timeEnd('part 2');
 
     console.log();
 });
-
-// 390 too low
