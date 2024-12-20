@@ -3,7 +3,7 @@ import { lines, readFile } from '../utils';
 const input1 = './input-example.txt';
 const input2 = './input.txt';
 
-[input2].forEach((name) => {
+[input1, input2].forEach((name) => {
     const [patterns, , ...towels] = lines(readFile(name)).map((line, i) => {
         if (i === 0) {
             return line.split(', ');
@@ -23,14 +23,15 @@ const input2 = './input.txt';
                 if (towel.startsWith(pattern, index)) {
                     if (dfs(towel, index + pattern.length)) {
                         memo[index] = true;
-                        return true;
+
+                        return memo[index];
                     }
                 }
             }
 
             memo[index] = false;
 
-            return false;
+            return memo[index];
         };
 
         if (dfs(towel, 0)) {
