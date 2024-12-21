@@ -23,13 +23,13 @@ const input2 = './input.txt';
                 if (towel.startsWith(pattern, index)) {
                     if (dfs(towel, index + pattern.length)) {
                         memo[index] = true;
-
-                        return memo[index];
                     }
                 }
             }
 
-            memo[index] = false;
+            if (!memo[index]) {
+                memo[index] = false;
+            }
 
             return memo[index];
         };
