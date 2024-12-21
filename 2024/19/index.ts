@@ -3,7 +3,9 @@ import { lines, readFile } from '../utils';
 const input1 = './input-example.txt';
 const input2 = './input.txt';
 
-[input1, input2].forEach((name) => {
+[input1].forEach((name) => {
+    // patterns can be [r, wr, b, g, bwu, rb, gb, br]
+    // towels can be [brwrr, bggr, gbbr, rrbgbr]
     const [patterns, , ...towels] = lines(readFile(name)).map((line, i) => {
         if (i === 0) {
             return line.split(', ');
@@ -12,34 +14,30 @@ const input2 = './input.txt';
         return line;
     }) as [string[], string, ...string[]];
 
-    const validTowels = towels.filter((towel, i) => {
-        const memo: { [key: number]: boolean } = {};
+    const totalMap = new Map<string, number>();
 
-        const dfs = (towel: string, index: number): boolean => {
-            if (index in memo) return memo[index];
-            if (index === towel.length) return true;
+    towels.forEach((towel, i) => {
+        const dfs = (towel: string, index: number, path: string[]) => {
+            if (towel.substring(index) === '') {
+                totalMap.set(towel, (totalMap.get(towel) || 0) + 1);
+
+                return true;
+            }
 
             for (const pattern of patterns) {
                 if (towel.startsWith(pattern, index)) {
-                    if (dfs(towel, index + pattern.length)) {
-                        memo[index] = true;
-                    }
+                    dfs(towel, index + pattern.length, [...path, pattern]);
                 }
             }
-
-            if (!memo[index]) {
-                memo[index] = false;
-            }
-
-            return memo[index];
         };
 
-        if (dfs(towel, 0)) {
-            return true;
-        }
-
-        return false;
+        dfs(towel, 0, []);
     });
 
-    console.log(name, 'part 1', validTowels.length);
+    console.log(name, 'part 1', totalMap.size);
+    console.log(
+        name,
+        'part 1',
+        totalMap.values().reduce((a, b) => a + b, 0)
+    );
 });
