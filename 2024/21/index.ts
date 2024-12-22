@@ -227,10 +227,8 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
                         path.split('') as DirectionalCmd[]
                     );
 
-                    if (i === robots - 1) {
-                        if (path.length < min) {
-                            return path.length;
-                        }
+                    if (i === robots - 1 && path.length < min) {
+                        return path.length;
                     }
                 }
 
@@ -248,7 +246,7 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
     console.timeEnd('part 1');
 
     console.time('part 2');
-    console.log(name, 'part 2', run(19));
+    console.log(name, 'part 2', run(10));
 
     console.timeEnd('part 2');
 });
@@ -256,6 +254,8 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
 // run 14: 9342424946
 // run 15: 23385945182
 // run 17: 146535243370
+// run 18: 366805291720
 
 // 9766693218 too low
 // 223025752849578 too high
+// 223880182934570 too high
