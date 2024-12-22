@@ -1,5 +1,6 @@
 import { Dir } from 'fs';
 import { lines, PriorityQueue, readFile } from '../utils';
+import { start } from 'repl';
 
 const input1 = './input-example.txt';
 const input2 = './input.txt';
@@ -149,53 +150,112 @@ function findPath(
     return res;
 }
 
-function findShortestPath() {}
+const cache = new Map<string, [number, number, string]>();
+
+function findDirectionalPath(cmds: DirectionalCmd[]) {
+    const paths: string[] = [];
+
+    let [startX, startY] = [
+        directionalKeypadMap.A[0],
+        directionalKeypadMap.A[1]
+    ];
+
+    let i = 0;
+
+    for (const cmd of cmds) {
+        const prevCmd = cmds[i - 1] ?? 'A';
+
+        if (cache.has(`${prevCmd}${cmd}`)) {
+            const entry = cache.get(`${prevCmd}${cmd}`)!;
+
+            startX = entry[0];
+            startY = entry[1];
+
+            paths.push(entry[2]);
+            i++;
+            continue;
+        }
+
+        const queue = new PriorityQueue<[number, number, number, string]>([
+            { item: [startX, startY, 0, ''], priority: 0 }
+        ]);
+
+        while (!queue.isEmpty()) {
+            const [x, y, cost, path] = queue.dequeue()!;
+            const [targetX, targetY] = directionalKeypadMap[cmd];
+
+            if (x === targetX && y === targetY) {
+                startX = x;
+                startY = y;
+
+                paths.push(`${path}A`);
+                cache.set(`${prevCmd}${cmd}`, [x, y, `${path}A`]);
+                break;
+            }
+
+            for (const [dx, dy] of dirs) {
+                const nx = x + dx;
+                const ny = y + dy;
+
+                if (directionalKeypad[ny]?.[nx] !== undefined) {
+                    const newCost = cost + 1;
+                    const d = dirMap[`${dx},${dy}`];
+
+                    queue.enqueue([nx, ny, newCost, `${path}${d}`], newCost);
+                }
+            }
+        }
+
+        i++;
+    }
+
+    return paths.join('');
+}
 
 [input2].forEach((name) => {
     const inputs = lines(readFile(name)).map((line) =>
         line.split('').map((c) => (c === 'A' ? 'A' : Number(c)))
     ) as NumericCmd[][];
 
-    let total = 0;
+    function run(robots: number) {
+        let total = 0;
 
-    for (const cmds of inputs) {
-        let all = new Set<string>();
-
-        const numRobots = 2;
-        const numericPaths = findPath(cmds, numericKeypad, numericKeypadMap);
-
-        console.log(numericPaths);
-
-        for (const numericPath of numericPaths) {
-            let directionalPaths = findPath(
-                numericPath.split('') as DirectionalCmd[],
-                directionalKeypad,
-                directionalKeypadMap
+        for (const cmds of inputs) {
+            const numericPaths = findPath(
+                cmds,
+                numericKeypad,
+                numericKeypadMap
             );
 
-            for (let i = 1; i <= numRobots - 1; i++) {
-                for (const path of directionalPaths) {
-                    directionalPaths = findPath(
-                        path.split('') as DirectionalCmd[],
-                        directionalKeypad,
-                        directionalKeypadMap
+            const min = numericPaths.reduce((min, p) => {
+                let path = findDirectionalPath(p.split('') as DirectionalCmd[]);
+
+                for (let i = 1; i <= robots - 1; i++) {
+                    path = findDirectionalPath(
+                        path.split('') as DirectionalCmd[]
                     );
 
-                    if (i === numRobots - 1) {
-                        directionalPaths.forEach((p) => all.add(p));
+                    if (i === robots - 1) {
+                        if (path.length < min) {
+                            return path.length;
+                        }
                     }
                 }
-            }
+
+                return min;
+            }, Infinity);
+
+            total += parseInt(cmds.join('')) * min;
         }
 
-        let min = Infinity;
-
-        for (const path of all) {
-            min = Math.min(min, path.length);
-        }
-
-        total += parseInt(cmds.join('')) * min;
+        return total;
     }
 
-    console.log(name, 'part 1', total);
+    console.time('part 1');
+    console.log(name, 'part 1', run(2));
+    console.timeEnd('part 1');
+
+    console.time('part 2');
+    console.log(name, 'part 2', run(13));
+    console.timeEnd('part 2');
 });
