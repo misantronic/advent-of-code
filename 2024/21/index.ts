@@ -74,8 +74,7 @@ type DirectionalCmd = '^' | 'v' | '<' | '>' | 'A';
 function findPath(
     cmds: (DirectionalCmd | NumericCmd)[],
     keypad: typeof numericKeypad | typeof directionalKeypad,
-    keypadMap: Record<string, P>,
-    longest = false
+    keypadMap: Record<string, P>
 ) {
     let cur = keypadMap.A;
     let completePaths: string[][] = [];
@@ -150,6 +149,8 @@ function findPath(
     return res;
 }
 
+function findShortestPath() {}
+
 [input2].forEach((name) => {
     const inputs = lines(readFile(name)).map((line) =>
         line.split('').map((c) => (c === 'A' ? 'A' : Number(c)))
@@ -163,7 +164,7 @@ function findPath(
         const numRobots = 2;
         const numericPaths = findPath(cmds, numericKeypad, numericKeypadMap);
 
-        // console.log(numericPaths);
+        console.log(numericPaths);
 
         for (const numericPath of numericPaths) {
             let directionalPaths = findPath(
@@ -177,8 +178,7 @@ function findPath(
                     directionalPaths = findPath(
                         path.split('') as DirectionalCmd[],
                         directionalKeypad,
-                        directionalKeypadMap,
-                        true
+                        directionalKeypadMap
                     );
 
                     if (i === numRobots - 1) {
