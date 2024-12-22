@@ -72,18 +72,14 @@ const directionalKeypadMap = {
 type NumericCmd = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 'A';
 type DirectionalCmd = '^' | 'v' | '<' | '>' | 'A';
 
-function findPath(
-    cmds: (DirectionalCmd | NumericCmd)[],
-    keypad: typeof numericKeypad | typeof directionalKeypad,
-    keypadMap: Record<string, P>
-) {
-    let cur = keypadMap.A;
+function findPath(cmds: NumericCmd[]) {
+    let cur = numericKeypadMap.A;
     let completePaths: string[][] = [];
 
     let i = 0;
 
     for (const cmd of cmds) {
-        const target = keypadMap[cmd];
+        const target = numericKeypadMap[cmd];
 
         const queue = new PriorityQueue<[number, number, number, string]>([
             { item: [...cur, 0, ''], priority: 0 }
@@ -116,7 +112,7 @@ function findPath(
                 const nx = x + dx;
                 const ny = y + dy;
 
-                if (keypad[ny]?.[nx] !== undefined) {
+                if (numericKeypad[ny]?.[nx] !== undefined) {
                     const newCost = cost + 1;
                     const d = dirMap[`${dx},${dy}`];
 
@@ -221,11 +217,7 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
         let total = 0;
 
         for (const cmds of inputs) {
-            const numericPaths = findPath(
-                cmds,
-                numericKeypad,
-                numericKeypadMap
-            );
+            const numericPaths = findPath(cmds);
 
             const min = numericPaths.reduce((min, p) => {
                 let path = findDirectionalPath(p.split('') as DirectionalCmd[]);
@@ -256,6 +248,14 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
     console.timeEnd('part 1');
 
     console.time('part 2');
-    console.log(name, 'part 2', run(13));
+    console.log(name, 'part 2', run(19));
+
     console.timeEnd('part 2');
 });
+
+// run 14: 9342424946
+// run 15: 23385945182
+// run 17: 146535243370
+
+// 9766693218 too low
+// 223025752849578 too high
