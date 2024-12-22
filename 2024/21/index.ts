@@ -72,7 +72,7 @@ const directionalKeypadMap = {
 type NumericCmd = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 'A';
 type DirectionalCmd = '^' | 'v' | '<' | '>' | 'A';
 
-function findPath(cmds: NumericCmd[]) {
+function findNumericPaths(cmds: NumericCmd[]) {
     let cur = numericKeypadMap.A;
     let completePaths: string[][] = [];
 
@@ -217,7 +217,7 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
         let total = 0;
 
         for (const cmds of inputs) {
-            const numericPaths = findPath(cmds);
+            const numericPaths = findNumericPaths(cmds);
 
             const min = numericPaths.reduce((min, p) => {
                 let path = findDirectionalPath(p.split('') as DirectionalCmd[]);
@@ -246,7 +246,7 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
     console.timeEnd('part 1');
 
     console.time('part 2');
-    console.log(name, 'part 2', run(10));
+    console.log(name, 'part 2', run(25));
 
     console.timeEnd('part 2');
 });
