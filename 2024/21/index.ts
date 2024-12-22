@@ -1,6 +1,6 @@
 import { lines, PriorityQueue, readFile } from '../utils';
 
-const input1 = './input-example.txt';
+// const input1 = './input-example.txt';
 const input2 = './input.txt';
 
 type P = [number, number];
@@ -217,21 +217,22 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
         for (const cmds of inputs) {
             const numericPaths = findNumericPaths(cmds);
 
-            const min = numericPaths.reduce((min, p) => {
-                let path = findDirectionalPath(p.split('') as DirectionalCmd[]);
+            let min = Infinity;
+
+            for (const numericPath of numericPaths) {
+                let path = findDirectionalPath(
+                    numericPath.split('') as DirectionalCmd[]
+                );
 
                 for (let i = 1; i <= robots - 1; i++) {
                     path = findDirectionalPath(
                         path.split('') as DirectionalCmd[]
                     );
-
                     if (i === robots - 1 && path.length < min) {
-                        return path.length;
+                        min = path.length;
                     }
                 }
-
-                return min;
-            }, Infinity);
+            }
 
             total += parseInt(cmds.join('')) * min;
         }
