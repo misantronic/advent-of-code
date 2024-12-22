@@ -1,6 +1,4 @@
-import { Dir } from 'fs';
 import { lines, PriorityQueue, readFile } from '../utils';
-import { start } from 'repl';
 
 const input1 = './input-example.txt';
 const input2 = './input.txt';
