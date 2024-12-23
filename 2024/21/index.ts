@@ -147,10 +147,7 @@ function findNumericPaths(cmds: NumericCmd[]) {
 function findDirectionalPath(cmds: Map<string, number>) {
     const pathMap = new Map<string, number>();
 
-    let [startX, startY] = [
-        directionalKeypadMap.A[0],
-        directionalKeypadMap.A[1]
-    ];
+    let [startX, startY] = directionalKeypadMap.A;
 
     let i = 0;
 
