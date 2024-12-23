@@ -1,6 +1,6 @@
 import { lines, PriorityQueue, readFile } from '../utils';
 
-// const input1 = './input-example.txt';
+const input1 = './input-example.txt';
 const input2 = './input.txt';
 
 type P = [number, number];
@@ -144,10 +144,8 @@ function findNumericPaths(cmds: NumericCmd[]) {
     return res;
 }
 
-const cache = new Map<string, [number, number, string]>();
-
-function findDirectionalPath(cmds: DirectionalCmd[]) {
-    const paths: string[] = [];
+function findDirectionalPath(cmds: Map<string, number>) {
+    const pathMap = new Map<string, number>();
 
     let [startX, startY] = [
         directionalKeypadMap.A[0],
@@ -156,57 +154,51 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
 
     let i = 0;
 
-    for (const cmd of cmds) {
-        const prevCmd = cmds[i - 1] ?? 'A';
+    for (const [cmdLine, count] of cmds) {
+        for (const cmd of cmdLine.split('') as DirectionalCmd[]) {
+            const queue = new PriorityQueue<[number, number, number, string]>([
+                { item: [startX, startY, 0, ''], priority: 0 }
+            ]);
 
-        if (cache.has(`${prevCmd}${cmd}`)) {
-            const entry = cache.get(`${prevCmd}${cmd}`)!;
+            while (!queue.isEmpty()) {
+                const [x, y, cost, path] = queue.dequeue()!;
+                const [targetX, targetY] = directionalKeypadMap[cmd];
 
-            startX = entry[0];
-            startY = entry[1];
+                if (x === targetX && y === targetY) {
+                    startX = x;
+                    startY = y;
 
-            paths.push(entry[2]);
-            i++;
-            continue;
-        }
+                    pathMap.set(
+                        `${path}A`,
+                        (pathMap.get(`${path}A`) ?? 0) + count
+                    );
+                    break;
+                }
 
-        const queue = new PriorityQueue<[number, number, number, string]>([
-            { item: [startX, startY, 0, ''], priority: 0 }
-        ]);
+                for (const [dx, dy] of dirs) {
+                    const nx = x + dx;
+                    const ny = y + dy;
 
-        while (!queue.isEmpty()) {
-            const [x, y, cost, path] = queue.dequeue()!;
-            const [targetX, targetY] = directionalKeypadMap[cmd];
+                    if (directionalKeypad[ny]?.[nx] !== undefined) {
+                        const newCost = cost + 1;
+                        const d = dirMap[`${dx},${dy}`];
 
-            if (x === targetX && y === targetY) {
-                startX = x;
-                startY = y;
-
-                paths.push(`${path}A`);
-                cache.set(`${prevCmd}${cmd}`, [x, y, `${path}A`]);
-                break;
-            }
-
-            for (const [dx, dy] of dirs) {
-                const nx = x + dx;
-                const ny = y + dy;
-
-                if (directionalKeypad[ny]?.[nx] !== undefined) {
-                    const newCost = cost + 1;
-                    const d = dirMap[`${dx},${dy}`];
-
-                    queue.enqueue([nx, ny, newCost, `${path}${d}`], newCost);
+                        queue.enqueue(
+                            [nx, ny, newCost, `${path}${d}`],
+                            newCost
+                        );
+                    }
                 }
             }
-        }
 
-        i++;
+            i++;
+        }
     }
 
-    return paths.join('');
+    return pathMap;
 }
 
-[input2].forEach((name) => {
+[input1, input2].forEach((name) => {
     const inputs = lines(readFile(name)).map((line) =>
         line.split('').map((c) => (c === 'A' ? 'A' : Number(c)))
     ) as NumericCmd[][];
@@ -220,16 +212,17 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
             let min = Infinity;
 
             for (const numericPath of numericPaths) {
-                let path = findDirectionalPath(
-                    numericPath.split('') as DirectionalCmd[]
-                );
+                let path = findDirectionalPath(new Map([[numericPath, 1]]));
 
-                for (let i = 1; i <= robots - 1; i++) {
-                    path = findDirectionalPath(
-                        path.split('') as DirectionalCmd[]
-                    );
-                    if (i === robots - 1 && path.length < min) {
-                        min = path.length;
+                for (let i = 1; i <= robots; i++) {
+                    path = findDirectionalPath(path);
+
+                    if (i === robots) {
+                        const len = path.values().reduce((a, b) => a + b, 0);
+
+                        if (len < min) {
+                            min = len;
+                        }
                     }
                 }
             }
@@ -256,5 +249,7 @@ function findDirectionalPath(cmds: DirectionalCmd[]) {
 // run 18: 366805291720
 
 // 9766693218 too low
+// 90239886870544 wrong
+// 225887582184500 wrong
 // 223025752849578 too high
 // 223880182934570 too high
