@@ -149,8 +149,6 @@ function findDirectionalPath(cmds: Map<string, number>) {
 
     let [startX, startY] = directionalKeypadMap.A;
 
-    let i = 0;
-
     for (const [cmdLine, count] of cmds) {
         for (const cmd of cmdLine.split('') as DirectionalCmd[]) {
             const queue = new PriorityQueue<[number, number, number, string]>([
@@ -187,8 +185,6 @@ function findDirectionalPath(cmds: Map<string, number>) {
                     }
                 }
             }
-
-            i++;
         }
     }
 
