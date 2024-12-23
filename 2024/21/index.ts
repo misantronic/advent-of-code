@@ -195,7 +195,7 @@ function findDirectionalPath(cmds: Map<string, number>) {
     return pathMap;
 }
 
-[input1, input2].forEach((name) => {
+[input2].forEach((name) => {
     const inputs = lines(readFile(name)).map((line) =>
         line.split('').map((c) => (c === 'A' ? 'A' : Number(c)))
     ) as NumericCmd[][];
@@ -235,17 +235,10 @@ function findDirectionalPath(cmds: Map<string, number>) {
     console.timeEnd('part 1');
 
     console.time('part 2');
-    console.log(name, 'part 2', run(25));
-
+    console.log(name, 'part 2', run(4));
     console.timeEnd('part 2');
 });
 
-// run 14: 9342424946
-// run 15: 23385945182
-// run 17: 146535243370
-// run 18: 366805291720
-
-// 9766693218 too low
 // 90239886870544 wrong
 // 225887582184500 wrong
 // 223025752849578 too high
